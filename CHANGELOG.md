@@ -99,8 +99,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Proper focus management
 - ARIA-like attributes
 
+#### BLoC/Cubit State Management (similar to smart_pagination)
+- `AutoSuggestCubit<T>` - Cubit for managing search state
+- `AutoSuggestState<T>` - Sealed class hierarchy for type-safe states
+  - `AutoSuggestInitial` - Initial state before search
+  - `AutoSuggestLoading` - Loading with optional previous items
+  - `AutoSuggestLoaded` - Success with items, fetchedAt, dataExpiredAt
+  - `AutoSuggestEmpty` - No results found
+  - `AutoSuggestError` - Error with retry support
+- `AutoSuggestConfig` - Configuration for debounce, cache, retry
+- `RetryConfig` - Exponential backoff retry configuration
+- `BlocAutoSuggestBox<T>` - Widget with built-in cubit integration
+- `AutoSuggestBlocBuilder<T>` - Convenience builder for exhaustive matching
+- Data expiration support (like smart_pagination's dataAge)
+- Cache hit rate and search statistics
+- Automatic prefix matching for cache lookups
+
 ### Dependencies
 - fluent_ui: ^4.13.0 - Fluent UI design system
+- flutter_bloc: ^8.1.6 - BLoC state management
+- equatable: ^2.0.5 - Value equality for states
 - gap: ^3.0.1 - Spacing utilities
 
 ---
@@ -110,10 +128,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### [0.1.0] - Planned
 
 #### Planned Features
-- Cubit/BLoC state management integration
-- `AutoSuggestCubit<T>` for bloc-based state management
-- `AutoSuggestState` classes (Initial, Loading, Loaded, Error)
-- Integration with existing bloc patterns
+- Pagination support for large datasets
 - RTL language improvements
 - Voice search support
 - Grouped suggestions

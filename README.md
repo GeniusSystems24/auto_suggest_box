@@ -4,7 +4,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![Flutter](https://img.shields.io/badge/Flutter-%3E%3D1.17.0-blue.svg)](https://flutter.dev)
 
-A highly customizable, performance-optimized auto-suggest/autocomplete widget for Flutter with Fluent UI design. Features include debounced search, LRU caching, keyboard navigation, form validation, and an advanced search dialog.
+A highly customizable, performance-optimized auto-suggest/autocomplete widget for Flutter with Fluent UI design. Features include debounced search, LRU caching, keyboard navigation, form validation, advanced search dialog, and BLoC/Cubit state management (similar to [smart_pagination](https://pub.dev/packages/smart_pagination)).
 
 ## Features
 
@@ -18,6 +18,7 @@ A highly customizable, performance-optimized auto-suggest/autocomplete widget fo
 - **Accessibility** - Semantic labels and screen reader support
 - **Recent Searches** - Track and display search history
 - **Advanced Search Dialog** - Full-featured search with filters, pagination, and multiple view modes
+- **BLoC/Cubit Support** - State management similar to smart_pagination
 - **Performance Optimized** - Reduced rebuilds, efficient memory usage
 
 ## Installation
@@ -94,6 +95,117 @@ FluentAutoSuggestBox<String>.form(
   autovalidateMode: AutovalidateMode.onUserInteraction,
   onSelected: (item) => setState(() => selectedCountry = item?.value),
 )
+```
+
+## Cubit/BLoC State Management
+
+Similar to [smart_pagination](https://pub.dev/packages/smart_pagination), this package provides a Cubit-based state management solution.
+
+### Creating a Cubit
+
+```dart
+final productsCubit = AutoSuggestCubit<Product>(
+  provider: (query, {filters}) async {
+    return await api.searchProducts(query);
+  },
+  config: AutoSuggestConfig(
+    debounceDelay: Duration(milliseconds: 300),
+    dataAge: Duration(minutes: 15),  // Cache expiration
+    maxCacheSize: 50,
+    retryConfig: RetryConfig(
+      maxRetries: 3,
+      initialDelay: Duration(seconds: 1),
+    ),
+  ),
+);
+```
+
+### Using BlocAutoSuggestBox
+
+```dart
+BlocAutoSuggestBox<Product>(
+  cubit: productsCubit,
+  itemBuilder: (context, product, isSelected, onTap) {
+    return ListTile(
+      title: Text(product.name),
+      subtitle: Text('\$${product.price}'),
+      selected: isSelected,
+      onPressed: onTap,
+    );
+  },
+  labelBuilder: (product) => product.name,
+  onSelected: (product) {
+    print('Selected: ${product.name}');
+  },
+  showStats: true,  // Show cache statistics
+)
+```
+
+### Using BlocBuilder Directly
+
+```dart
+BlocBuilder<AutoSuggestCubit<Product>, AutoSuggestState<Product>>(
+  bloc: productsCubit,
+  builder: (context, state) {
+    return switch (state) {
+      AutoSuggestInitial() => Text('Start typing to search...'),
+      AutoSuggestLoading(:final query) => CircularProgressIndicator(),
+      AutoSuggestLoaded(:final items) => ListView.builder(
+        itemCount: items.length,
+        itemBuilder: (context, index) => Text(items[index].name),
+      ),
+      AutoSuggestEmpty(:final query) => Text('No results for "$query"'),
+      AutoSuggestError(:final error) => Text('Error: $error'),
+    };
+  },
+)
+```
+
+### AutoSuggestBlocBuilder (Convenience Widget)
+
+```dart
+AutoSuggestBlocBuilder<Product>(
+  cubit: productsCubit,
+  onInitial: (context) => Text('Ready to search'),
+  onLoading: (context, query, previousItems) => ProgressRing(),
+  onLoaded: (context, items, query) => ProductList(items: items),
+  onEmpty: (context, query) => Text('No products found'),
+  onError: (context, error, query, previousItems) => ErrorWidget(error),
+)
+```
+
+### State Classes
+
+| State | Properties | Description |
+|-------|------------|-------------|
+| `AutoSuggestInitial` | - | Initial state before any search |
+| `AutoSuggestLoading` | `query`, `previousItems`, `isLoadingMore` | Loading state |
+| `AutoSuggestLoaded` | `items`, `query`, `fetchedAt`, `dataExpiredAt` | Success with data |
+| `AutoSuggestEmpty` | `query`, `searchedAt` | No results found |
+| `AutoSuggestError` | `error`, `query`, `previousItems` | Error state |
+
+### Data Expiration (like smart_pagination)
+
+```dart
+// Check if data is expired
+if (cubit.isDataExpired) {
+  await cubit.refresh();
+}
+
+// Or use automatic check
+await cubit.checkAndRefreshIfExpired();
+
+// Access data age
+final age = cubit.dataAge;  // Duration since last fetch
+```
+
+### Statistics
+
+```dart
+final stats = cubit.stats;
+print('Cache hits: ${stats['cacheHits']}');
+print('Cache misses: ${stats['cacheMisses']}');
+print('Hit rate: ${(stats['cacheHitRate'] * 100).toStringAsFixed(1)}%');
 ```
 
 ## API Reference
@@ -383,16 +495,19 @@ flutter run
 ## Dependencies
 
 - [fluent_ui](https://pub.dev/packages/fluent_ui) ^4.13.0
+- [flutter_bloc](https://pub.dev/packages/flutter_bloc) ^8.1.6
+- [equatable](https://pub.dev/packages/equatable) ^2.0.5
 - [gap](https://pub.dev/packages/gap) ^3.0.1
 
 ## Roadmap
 
-- [ ] Cubit/BLoC state management integration (similar to smart_pagination)
+- [x] Cubit/BLoC state management integration (similar to smart_pagination)
 - [ ] RTL language support improvements
 - [ ] More animation options
 - [ ] Voice search support
 - [ ] Grouped suggestions
 - [ ] Inline suggestions (ghost text)
+- [ ] Pagination support for large datasets
 
 ## Contributing
 

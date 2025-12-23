@@ -1,5 +1,5 @@
 name: auto_suggest_box
-description: "A highly customizable, performance-optimized auto-suggest/autocomplete widget for Flutter with Fluent UI design. Features debounced search, LRU caching, keyboard navigation, form validation, and advanced search dialog."
+description: "A highly customizable, performance-optimized auto-suggest/autocomplete widget for Flutter with Fluent UI design. Features debounced search, LRU caching, keyboard navigation, form validation, advanced search dialog, and BLoC/Cubit state management."
 version: 0.0.1
 homepage: https://github.com/example/auto_suggest_box
 repository: https://github.com/example/auto_suggest_box
@@ -10,7 +10,7 @@ topics:
   - autosuggest
   - search
   - fluent-ui
-  - widgets
+  - bloc
 
 environment:
   sdk: ^3.10.3
@@ -20,6 +20,8 @@ dependencies:
   fluent_ui: ^4.13.0
   flutter:
     sdk: flutter
+  flutter_bloc: ^8.1.6
+  equatable: ^2.0.5
   gap: ^3.0.1
 
 dev_dependencies:

@@ -6,6 +6,7 @@ import 'form_validation_page.dart';
 import 'custom_builders_page.dart';
 import 'advanced_search_page.dart';
 import 'caching_demo_page.dart';
+import 'cubit_example_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -47,6 +48,11 @@ class _HomePageState extends State<HomePage> {
       icon: const Icon(FluentIcons.database),
       title: const Text('Caching Demo'),
       body: const CachingDemoPage(),
+    ),
+    PaneItem(
+      icon: const Icon(FluentIcons.code),
+      title: const Text('Cubit/BLoC'),
+      body: const CubitExamplePage(),
     ),
   ];
 

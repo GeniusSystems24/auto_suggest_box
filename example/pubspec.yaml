@@ -10,6 +10,7 @@ dependencies:
   flutter:
     sdk: flutter
   fluent_ui: ^4.13.0
+  flutter_bloc: ^8.1.6
   gap: ^3.0.1
   auto_suggest_box:
     path: ../
