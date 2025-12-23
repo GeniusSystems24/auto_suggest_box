@@ -1,0 +1,23 @@
+name: auto_suggest_box_example
+description: Example app demonstrating auto_suggest_box features.
+publish_to: 'none'
+version: 1.0.0
+
+environment:
+  sdk: ^3.10.3
+
+dependencies:
+  flutter:
+    sdk: flutter
+  fluent_ui: ^4.13.0
+  gap: ^3.0.1
+  auto_suggest_box:
+    path: ../
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
