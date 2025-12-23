@@ -1,5 +1,6 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:auto_suggest_box/auto_suggest/auto_suggest.dart';
+import 'package:flutter/material.dart' show InputDecoration;
 import 'package:gap/gap.dart';
 
 import '../data/sample_data.dart';

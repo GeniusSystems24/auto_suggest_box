@@ -1,5 +1,6 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:auto_suggest_box/auto_suggest/auto_suggest.dart';
+import 'package:flutter/material.dart' show InputDecoration;
 import 'package:gap/gap.dart';
 
 import '../data/sample_data.dart';
@@ -170,7 +171,7 @@ class _BasicExamplePageState extends State<BasicExamplePage> {
           const Gap(16),
           const Row(
             children: [
-              Icon(FluentIcons.keyboard, size: 16),
+              Icon(FluentIcons.keyboard_classic, size: 16),
               Gap(8),
               Text('Arrow Down/Up: Navigate | Enter: Select | Escape: Close'),
             ],

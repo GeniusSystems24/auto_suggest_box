@@ -1,6 +1,7 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:auto_suggest_box/auto_suggest/auto_suggest.dart';
 import 'package:auto_suggest_box/advanced_auto_suggest/auto_suggest_advanced.dart';
+import 'package:flutter/material.dart' show Chip;
 import 'package:gap/gap.dart';
 import 'package:flutter/services.dart';
 
@@ -79,7 +80,7 @@ class _AdvancedSearchPageState extends State<AdvancedSearchPage> {
               ),
               Row(
                 children: [
-                  const Icon(FluentIcons.keyboard, size: 14),
+                  const Icon(FluentIcons.keyboard_classic, size: 14),
                   const Gap(4),
                   const Text('F3', style: TextStyle(fontSize: 12)),
                   const Gap(8),
@@ -159,6 +160,7 @@ class _AdvancedSearchPageState extends State<AdvancedSearchPage> {
                 style: TextStyle(fontWeight: FontWeight.w600),
               ),
               FilledButton(
+                onPressed: _openMultiSelectSearch,
                 child: const Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -167,7 +169,6 @@ class _AdvancedSearchPageState extends State<AdvancedSearchPage> {
                     Text('Select Products'),
                   ],
                 ),
-                onPressed: _openMultiSelectSearch,
               ),
             ],
           ),
@@ -180,8 +181,8 @@ class _AdvancedSearchPageState extends State<AdvancedSearchPage> {
               runSpacing: 8,
               children: _selectedProducts
                   .map((p) => Chip(
-                        text: Text(p.name),
-                        onPressed: () {
+                        label: Text(p.name),
+                        onDeleted: () {
                           setState(() {
                             _selectedProducts.remove(p);
                           });

@@ -1,5 +1,6 @@
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:flutter/material.dart' hide Card, ListTile, Divider, Tooltip, Colors;
+import 'package:flutter/material.dart' hide Card, ListTile, Divider, Tooltip, Colors, IconButton;
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 
@@ -149,7 +150,6 @@ class _BlocAutoSuggestBoxState<T> extends State<BlocAutoSuggestBox<T>> {
   final LayerLink _layerLink = LayerLink();
   final GlobalKey _textBoxKey = GlobalKey();
   int _selectedIndex = -1;
-  bool _isOverlayVisible = false;
 
   @override
   void initState() {
@@ -201,13 +201,11 @@ class _BlocAutoSuggestBoxState<T> extends State<BlocAutoSuggestBox<T>> {
     );
 
     Overlay.of(context).insert(_overlayEntry!);
-    _isOverlayVisible = true;
   }
 
   void _dismissOverlay() {
     _overlayEntry?.remove();
     _overlayEntry = null;
-    _isOverlayVisible = false;
   }
 
   Widget _buildOverlay() {

@@ -1,5 +1,6 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:auto_suggest_box/auto_suggest/auto_suggest.dart';
+import 'package:flutter/material.dart' show InputDecoration;
 import 'package:gap/gap.dart';
 
 import '../data/sample_data.dart';
@@ -25,9 +26,7 @@ class _ServerSearchPageState extends State<ServerSearchPage> {
   @override
   Widget build(BuildContext context) {
     return ScaffoldPage.scrollable(
-      header: const PageHeader(
-        title: Text('Server-Side Search'),
-      ),
+      header: const PageHeader(title: Text('Server-Side Search')),
       children: [
         _buildInfoCard(
           'Async Search with Loading State',
@@ -82,11 +81,15 @@ class _ServerSearchPageState extends State<ServerSearchPage> {
             onNoResultsFound: (query) async {
               final results = await searchProducts(query);
               return results
-                  .map((p) => FluentAutoSuggestBoxItem(
-                        value: p,
-                        label: p.name,
-                        subtitle: Text('\$${p.price.toStringAsFixed(2)} - ${p.category}'),
-                      ))
+                  .map(
+                    (p) => FluentAutoSuggestBoxItem(
+                      value: p,
+                      label: p.name,
+                      subtitle: Text(
+                        '\$${p.price.toStringAsFixed(2)} - ${p.category}',
+                      ),
+                    ),
+                  )
                   .toList();
             },
             onSelected: (item) {
@@ -115,13 +118,18 @@ class _ServerSearchPageState extends State<ServerSearchPage> {
           const Gap(16),
           if (_selectedProduct != null)
             Card(
-              backgroundColor: FluentTheme.of(context).accentColor.withOpacity(0.1),
+              backgroundColor: FluentTheme.of(
+                context,
+              ).accentColor.withOpacity(0.1),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     _selectedProduct!.name,
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
                   ),
                   const Gap(4),
                   Text(_selectedProduct!.description),
@@ -129,7 +137,10 @@ class _ServerSearchPageState extends State<ServerSearchPage> {
                   Row(
                     children: [
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
                         decoration: BoxDecoration(
                           color: FluentTheme.of(context).accentColor,
                           borderRadius: BorderRadius.circular(4),
@@ -167,11 +178,13 @@ class _ServerSearchPageState extends State<ServerSearchPage> {
             onNoResultsFound: (query) async {
               final results = await searchUsers(query);
               return results
-                  .map((u) => FluentAutoSuggestBoxItem(
-                        value: u,
-                        label: u.name,
-                        subtitle: Text('${u.email} | ${u.department}'),
-                      ))
+                  .map(
+                    (u) => FluentAutoSuggestBoxItem(
+                      value: u,
+                      label: u.name,
+                      subtitle: Text('${u.email} | ${u.department}'),
+                    ),
+                  )
                   .toList();
             },
             loadingBuilder: (context) {
@@ -205,7 +218,9 @@ class _ServerSearchPageState extends State<ServerSearchPage> {
                 ),
               ),
               title: Text(_selectedUser!.name),
-              subtitle: Text('${_selectedUser!.email}\n${_selectedUser!.department}'),
+              subtitle: Text(
+                '${_selectedUser!.email}\n${_selectedUser!.department}',
+              ),
             ),
         ],
       ),
@@ -240,8 +255,14 @@ class _ServerSearchPageState extends State<ServerSearchPage> {
             spacing: 16,
             runSpacing: 8,
             children: [
-              _buildStatItem('Total Searches', stats['totalSearches'].toString()),
-              _buildStatItem('Successful', stats['successfulSearches'].toString()),
+              _buildStatItem(
+                'Total Searches',
+                stats['totalSearches'].toString(),
+              ),
+              _buildStatItem(
+                'Successful',
+                stats['successfulSearches'].toString(),
+              ),
               _buildStatItem('Failed', stats['failedSearches'].toString()),
               _buildStatItem(
                 'Success Rate',

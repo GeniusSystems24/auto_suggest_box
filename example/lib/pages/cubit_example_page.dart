@@ -1,4 +1,5 @@
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:flutter/material.dart' show InputDecoration, Chip;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:auto_suggest_box/auto_suggest_box.dart';
 import 'package:gap/gap.dart';
@@ -77,9 +78,7 @@ class _CubitExamplePageState extends State<CubitExamplePage> {
   @override
   Widget build(BuildContext context) {
     return ScaffoldPage.scrollable(
-      header: const PageHeader(
-        title: Text('Cubit State Management'),
-      ),
+      header: const PageHeader(title: Text('Cubit State Management')),
       children: [
         _buildInfoCard(
           'BLoC/Cubit Pattern',
@@ -158,9 +157,7 @@ class _CubitExamplePageState extends State<CubitExamplePage> {
             onSelected: (product) {
               setState(() => _selectedProduct = product);
             },
-            decoration: const InputDecoration(
-              hintText: 'Search products...',
-            ),
+            decoration: const InputDecoration(hintText: 'Search products...'),
             showStats: true,
           ),
           if (_selectedProduct != null) ...[
@@ -203,9 +200,9 @@ class _CubitExamplePageState extends State<CubitExamplePage> {
                   color: FluentTheme.of(context).cardColor,
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(
-                    color: FluentTheme.of(context)
-                        .resources
-                        .dividerStrokeColorDefault,
+                    color: FluentTheme.of(
+                      context,
+                    ).resources.dividerStrokeColorDefault,
                   ),
                 ),
                 child: Column(
@@ -288,12 +285,14 @@ class _CubitExamplePageState extends State<CubitExamplePage> {
                 runSpacing: 8,
                 children: items
                     .take(5)
-                    .map((c) => Chip(
-                          text: Text('${c.flag} ${c.name}'),
-                          onPressed: () {
-                            setState(() => _selectedCountry = c);
-                          },
-                        ))
+                    .map(
+                      (c) => Chip(
+                        label: Text('${c.flag} ${c.name}'),
+                        onDeleted: () {
+                          setState(() => _selectedCountry = c);
+                        },
+                      ),
+                    )
                     .toList(),
               ),
             ),
@@ -301,7 +300,7 @@ class _CubitExamplePageState extends State<CubitExamplePage> {
               padding: const EdgeInsets.all(16),
               child: Row(
                 children: [
-                  const Icon(FluentIcons.emoji_sad),
+                  const Icon(FluentIcons.emoji_neutral),
                   const Gap(12),
                   Text('No countries found for "$query"'),
                 ],
@@ -420,7 +419,7 @@ class _CubitExamplePageState extends State<CubitExamplePage> {
 
   Widget _buildStateIndicator(AutoSuggestState state) {
     final (color, icon) = switch (state) {
-      AutoSuggestInitial() => (Colors.grey, FluentIcons.circle),
+      AutoSuggestInitial() => (Colors.grey, FluentIcons.circle_fill),
       AutoSuggestLoading() => (Colors.blue, FluentIcons.progress_ring_dots),
       AutoSuggestLoaded() => (Colors.green, FluentIcons.check_mark),
       AutoSuggestEmpty() => (Colors.orange, FluentIcons.warning),
@@ -443,9 +442,9 @@ class _CubitExamplePageState extends State<CubitExamplePage> {
       AutoSuggestInitial() => const Text('Ready to search'),
       AutoSuggestLoading(:final query) => Text('Searching: "$query"'),
       AutoSuggestLoaded(:final items, :final query, :final dataAge) => Text(
-          'Found ${items.length} users for "$query"\n'
-          'Data age: ${dataAge.inSeconds}s',
-        ),
+        'Found ${items.length} users for "$query"\n'
+        'Data age: ${dataAge.inSeconds}s',
+      ),
       AutoSuggestEmpty(:final query) => Text('No users match "$query"'),
       AutoSuggestError(:final error) => Text('Error: $error'),
     };
@@ -477,7 +476,9 @@ class _CubitExamplePageState extends State<CubitExamplePage> {
                 Text(
                   product.name,
                   style: const TextStyle(
-                      fontWeight: FontWeight.bold, fontSize: 16),
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
                 ),
                 Text(product.description),
                 const Gap(4),
@@ -485,7 +486,9 @@ class _CubitExamplePageState extends State<CubitExamplePage> {
                   children: [
                     Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 2),
+                        horizontal: 8,
+                        vertical: 2,
+                      ),
                       decoration: BoxDecoration(
                         color: FluentTheme.of(context).accentColor,
                         borderRadius: BorderRadius.circular(4),
@@ -532,7 +535,9 @@ class _CubitExamplePageState extends State<CubitExamplePage> {
                 Text(
                   user.name,
                   style: const TextStyle(
-                      fontWeight: FontWeight.bold, fontSize: 16),
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
                 ),
                 Text(user.email),
                 Text(user.department),
@@ -558,7 +563,9 @@ class _CubitExamplePageState extends State<CubitExamplePage> {
                 Text(
                   country.name,
                   style: const TextStyle(
-                      fontWeight: FontWeight.bold, fontSize: 16),
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
                 ),
                 Text('Code: ${country.code}'),
                 Text('Continent: ${country.continent}'),
@@ -587,10 +594,7 @@ class _UserSearchField extends StatefulWidget {
   final AutoSuggestCubit<User> cubit;
   final void Function(User) onSelected;
 
-  const _UserSearchField({
-    required this.cubit,
-    required this.onSelected,
-  });
+  const _UserSearchField({required this.cubit, required this.onSelected});
 
   @override
   State<_UserSearchField> createState() => _UserSearchFieldState();
@@ -632,10 +636,7 @@ class _CountrySearchField extends StatefulWidget {
   final AutoSuggestCubit<Country> cubit;
   final void Function(Country) onSelected;
 
-  const _CountrySearchField({
-    required this.cubit,
-    required this.onSelected,
-  });
+  const _CountrySearchField({required this.cubit, required this.onSelected});
 
   @override
   State<_CountrySearchField> createState() => _CountrySearchFieldState();
