@@ -1,5 +1,3 @@
-part of 'auto_suggest.dart';
-
 /// Cache for storing search results with LRU eviction policy
 ///
 /// Features:

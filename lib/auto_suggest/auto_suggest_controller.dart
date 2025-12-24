@@ -1,4 +1,5 @@
-part of 'auto_suggest.dart';
+import 'dart:async';
+import 'package:flutter/foundation.dart';
 
 /// Controller for managing AutoSuggestBox state and business logic
 ///

@@ -1,4 +1,8 @@
-part of 'auto_suggest.dart';
+import 'package:flutter/material.dart' hide Card, ListTile, Divider, Tooltip, IconButton, Colors;
+import 'package:fluent_ui/fluent_ui.dart';
+import 'package:gap/gap.dart';
+
+import 'auto_suggest_item.dart';
 
 enum AutoSuggestBoxDirection { below, above }
 

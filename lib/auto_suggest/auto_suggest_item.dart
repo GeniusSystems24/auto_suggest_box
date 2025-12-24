@@ -1,4 +1,5 @@
-part of 'auto_suggest.dart';
+import 'package:flutter/material.dart' hide Card, ListTile, Divider, Tooltip, IconButton, Colors;
+import 'package:fluent_ui/fluent_ui.dart';
 
 const double kDefaultItemHeight = 50.0;
 

@@ -13,10 +13,17 @@ import '../common/text.dart';
 import '../bloc/auto_suggest_cubit.dart';
 import '../bloc/auto_suggest_state.dart';
 
-part 'auto_suggest_controller.dart';
-part 'auto_suggest_cache.dart';
-part 'auto_suggest_item.dart';
-part 'auto_suggest_overlay.dart';
+// Export all components
+export 'auto_suggest_item.dart';
+export 'auto_suggest_cache.dart';
+export 'auto_suggest_controller.dart';
+export 'auto_suggest_overlay.dart';
+
+// Import for internal use
+import 'auto_suggest_item.dart';
+import 'auto_suggest_cache.dart';
+import 'auto_suggest_controller.dart';
+import 'auto_suggest_overlay.dart';
 
 const double kDefaultMaxPopupHeight = 380.0;
 
