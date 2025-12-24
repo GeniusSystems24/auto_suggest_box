@@ -99,72 +99,144 @@ FluentAutoSuggestBox<String>.form(
 
 ## Cubit/BLoC State Management
 
-Similar to [smart_pagination](https://pub.dev/packages/smart_pagination), this package provides a Cubit-based state management solution integrated directly into `FluentAutoSuggestBox`.
+This package provides `FluentAutoSuggestBoxCubit` to manage the state of `FluentAutoSuggestBox` widget.
 
 ### Creating a Cubit
 
 ```dart
-final productsCubit = AutoSuggestCubit<Product>(
-  provider: (query, {filters}) async {
-    return await api.searchProducts(query);
-  },
-  config: AutoSuggestConfig(
-    debounceDelay: Duration(milliseconds: 300),
-    dataAge: Duration(minutes: 15),  // Cache expiration
-    maxCacheSize: 50,
-    retryConfig: RetryConfig(
-      maxRetries: 3,
-      initialDelay: Duration(seconds: 1),
-    ),
-  ),
-);
+final cubit = FluentAutoSuggestBoxCubit<Product>();
 ```
 
-### Using FluentAutoSuggestBox.cubit (Recommended)
-
-The integrated cubit mode provides the same FluentAutoSuggestBox experience with Cubit state management:
+### Managing Items
 
 ```dart
-FluentAutoSuggestBox<Product>.cubit(
-  cubit: productsCubit,
-  cubitItemBuilder: (context, product, isSelected, onTap) {
-    return ListTile(
-      title: Text(product.name),
-      subtitle: Text('\$${product.price}'),
-      selected: isSelected,
-      onPressed: onTap,
+// Set items
+cubit.setItems([
+  FluentAutoSuggestBoxItem(value: product1, label: 'iPhone'),
+  FluentAutoSuggestBoxItem(value: product2, label: 'Samsung'),
+  FluentAutoSuggestBoxItem(value: product3, label: 'Pixel'),
+]);
+
+// Add item
+cubit.addItem(FluentAutoSuggestBoxItem(value: product4, label: 'OnePlus'));
+
+// Remove item
+cubit.removeItem(item);
+cubit.removeItemByValue(product1);
+
+// Clear all items
+cubit.clearItems();
+```
+
+### Selection
+
+```dart
+// Select an item
+cubit.selectItem(item);
+cubit.selectByValue(product1);
+cubit.selectByIndex(0);
+
+// Clear selection
+cubit.clearSelection();
+
+// Get selected item
+final selected = cubit.state.selectedItem;
+```
+
+### Loading State
+
+```dart
+// Show loading
+cubit.setLoading(true);
+
+// Load from server
+final products = await api.getProducts();
+cubit.setItems(products.map((p) =>
+  FluentAutoSuggestBoxItem(value: p, label: p.name)
+).toList());
+
+// Hide loading
+cubit.setLoading(false);
+```
+
+### Error Handling
+
+```dart
+try {
+  cubit.setLoading(true);
+  final products = await api.getProducts();
+  cubit.setItems(products);
+} catch (e) {
+  cubit.setError(e);
+} finally {
+  cubit.setLoading(false);
+}
+```
+
+### Using with FluentAutoSuggestBox
+
+```dart
+BlocBuilder<FluentAutoSuggestBoxCubit<Product>, FluentAutoSuggestBoxState<Product>>(
+  bloc: cubit,
+  builder: (context, state) {
+    return FluentAutoSuggestBox<Product>(
+      items: state.items,
+      enabled: state.isEnabled && !state.isLoading,
+      onSelected: (item) {
+        if (item != null) {
+          cubit.selectItem(item);
+        }
+      },
+      loadingBuilder: state.isLoading
+        ? (context) => const ProgressRing()
+        : null,
     );
   },
-  labelBuilder: (product) => product.name,
-  onCubitSelected: (product) {
-    print('Selected: ${product.name}');
-  },
-  showCubitStats: true,  // Show cache statistics
 )
 ```
 
-### Using BlocAutoSuggestBox (Standalone)
-
-You can also use the standalone `BlocAutoSuggestBox` widget:
+### State Properties
 
 ```dart
-BlocAutoSuggestBox<Product>(
-  cubit: productsCubit,
-  itemBuilder: (context, product, isSelected, onTap) {
-    return ListTile(
-      title: Text(product.name),
-      subtitle: Text('\$${product.price}'),
-      selected: isSelected,
-      onPressed: onTap,
-    );
-  },
-  labelBuilder: (product) => product.name,
-  onSelected: (product) {
-    print('Selected: ${product.name}');
-  },
-  showStats: true,  // Show cache statistics
-)
+final state = cubit.state;
+
+state.items           // List of items
+state.selectedItem    // Currently selected item
+state.text            // Current text in input
+state.isLoading       // Loading state
+state.error           // Error object (if any)
+state.hasError        // Has error
+state.hasSelection    // Has selected item
+state.isEmpty         // Items list is empty
+state.itemCount       // Number of items
+state.isEnabled       // Is widget enabled
+state.isReadOnly      // Is widget read-only
 ```
+
+### Available Methods
+
+| Method | Description |
+|--------|-------------|
+| `setItems(items)` | Set all items |
+| `addItem(item)` | Add single item |
+| `addItems(items)` | Add multiple items |
+| `removeItem(item)` | Remove item |
+| `removeItemByValue(value)` | Remove by value |
+| `clearItems()` | Clear all items |
+| `selectItem(item)` | Select item |
+| `selectByValue(value)` | Select by value |
+| `selectByIndex(index)` | Select by index |
+| `clearSelection()` | Clear selection |
+| `setText(text)` | Set input text |
+| `clearText()` | Clear input text |
+| `setLoading(bool)` | Set loading state |
+| `setError(error)` | Set error |
+| `clearError()` | Clear error |
+| `setEnabled(bool)` | Enable/disable |
+| `setReadOnly(bool)` | Set read-only |
+| `reset()` | Reset to initial state |
+| `clear()` | Clear selection, text, error |
+| `search(query)` | Search in local items |
 
 ### Using BlocBuilder Directly
 

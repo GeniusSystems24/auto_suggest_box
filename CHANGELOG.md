@@ -99,34 +99,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Proper focus management
 - ARIA-like attributes
 
-#### BLoC/Cubit State Management (similar to smart_pagination)
-- `AutoSuggestCubit<T>` - Cubit for managing search state
-- `AutoSuggestState<T>` - Sealed class hierarchy for type-safe states
-  - `AutoSuggestInitial` - Initial state before search
-  - `AutoSuggestLoading` - Loading with optional previous items
-  - `AutoSuggestLoaded` - Success with items, fetchedAt, dataExpiredAt
-  - `AutoSuggestEmpty` - No results found
-  - `AutoSuggestError` - Error with retry support
-- `AutoSuggestConfig` - Configuration for debounce, cache, retry
-- `RetryConfig` - Exponential backoff retry configuration
-- `BlocAutoSuggestBox<T>` - Standalone widget with built-in cubit integration
-- `AutoSuggestBlocBuilder<T>` - Convenience builder for exhaustive matching
-- Data expiration support (like smart_pagination's dataAge)
-- Cache hit rate and search statistics
-- Automatic prefix matching for cache lookups
-
-#### Integrated Cubit Mode
-- `FluentAutoSuggestBox<T>.cubit()` - Constructor for cubit-based state management
-- Seamless integration with FluentAutoSuggestBox using cubit for data fetching
-- `cubitItemBuilder` - Custom item builder for cubit mode
-- `labelBuilder` - Function to extract label from item
-- `onCubitSelected` - Callback when item is selected in cubit mode
-- `cubitFilters` - Pass filters to cubit search
-- `showCubitStats` - Display cache statistics bar
-- `cubitLoadingBuilder`, `cubitErrorBuilder`, `cubitEmptyBuilder` - Custom builders for states
-- Loading indicator in text field suffix during search
-- Clear button integration with cubit.clear()
-- Keyboard navigation support (Arrow keys, Enter, Escape)
+#### BLoC/Cubit State Management
+- `FluentAutoSuggestBoxCubit<T>` - Cubit for managing FluentAutoSuggestBox state
+- `FluentAutoSuggestBoxState<T>` - State class with:
+  - `items` - List of suggestion items
+  - `selectedItem` - Currently selected item
+  - `text` - Current input text
+  - `isLoading` - Loading state
+  - `error` - Error object
+  - `isEnabled` / `isReadOnly` - Widget state
+- Item management methods: `setItems`, `addItem`, `addItems`, `removeItem`, `clearItems`
+- Selection methods: `selectItem`, `selectByValue`, `selectByIndex`, `clearSelection`
+- State methods: `setLoading`, `setError`, `clearError`, `setEnabled`, `setReadOnly`
+- Helper methods: `reset`, `clear`, `search`, `getItemAt`, `getItemByValue`
 
 ### Dependencies
 - fluent_ui: ^4.13.0 - Fluent UI design system
