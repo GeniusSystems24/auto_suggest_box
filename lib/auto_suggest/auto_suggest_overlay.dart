@@ -61,6 +61,7 @@ class AutoSuggestOverlayState<T> extends State<AutoSuggestOverlay<T>> {
   // Track pending search to prevent race conditions
   String? _pendingSearch;
   bool _isSearching = false;
+  bool _searchCompletedWithNoResults = false;
 
   @override
   void initState() {
@@ -88,6 +89,8 @@ class AutoSuggestOverlayState<T> extends State<AutoSuggestOverlay<T>> {
 
   void _onTextChanged() {
     if (!mounted) return;
+    // Reset search completed flag when text changes
+    _searchCompletedWithNoResults = false;
     _updateSortedItems();
   }
 
@@ -105,10 +108,14 @@ class AutoSuggestOverlayState<T> extends State<AutoSuggestOverlay<T>> {
     setState(() {
       _sortedItems = newSortedItems;
       _selectedIndex = -1;
+      // Reset search completed flag when text changes
+      if (newSortedItems.isNotEmpty) {
+        _searchCompletedWithNoResults = false;
+      }
     });
 
     // Trigger search if no results and callback is provided
-    if (searchText.isNotEmpty && newSortedItems.isEmpty && !_isSearching) {
+    if (searchText.isNotEmpty && newSortedItems.isEmpty && !_isSearching && !_searchCompletedWithNoResults) {
       _performSearch(searchText);
     }
   }
@@ -118,6 +125,10 @@ class AutoSuggestOverlayState<T> extends State<AutoSuggestOverlay<T>> {
 
     _pendingSearch = query;
     _isSearching = true;
+
+    if (mounted) {
+      setState(() {});
+    }
 
     try {
       // Add delay to prevent too many requests
@@ -137,15 +148,27 @@ class AutoSuggestOverlayState<T> extends State<AutoSuggestOverlay<T>> {
       if (results.isNotEmpty) {
         // Add new items to the set
         _items.value = {..._items.value, ...results};
+        _searchCompletedWithNoResults = false;
         _updateSortedItems();
+      } else {
+        // Search completed but no results found
+        setState(() {
+          _searchCompletedWithNoResults = true;
+        });
       }
     } catch (e, stack) {
       if (mounted) {
         widget.onError?.call(e, stack);
+        setState(() {
+          _searchCompletedWithNoResults = true;
+        });
       }
     } finally {
       _isSearching = false;
       _pendingSearch = null;
+      if (mounted) {
+        setState(() {});
+      }
     }
   }
 
@@ -223,8 +246,8 @@ class AutoSuggestOverlayState<T> extends State<AutoSuggestOverlay<T>> {
   }
 
   Widget _buildContent(ThemeData theme) {
-    // Show loading state
-    if (widget.isLoading || _isSearching) {
+    // Show loading state only if searching and not completed
+    if ((widget.isLoading || _isSearching) && !_searchCompletedWithNoResults) {
       return widget.loadingBuilder?.call(context) ??
           _buildDefaultLoadingWidget();
     }
