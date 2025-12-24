@@ -329,7 +329,7 @@ class BlocAutoSuggestBox<T> extends StatelessWidget {
 
 ## Implementation Plan
 
-### Phase 1: Core Cubit (v0.1.0)
+### Phase 1: Core Cubit (v0.1.1)
 1. Create `AutoSuggestState` sealed class hierarchy
 2. Implement `AutoSuggestCubit` with basic functionality
 3. Add debouncing and caching integration
@@ -422,8 +422,8 @@ BlocBuilder<AutoSuggestCubit<Product>, AutoSuggestState<Product>>(
 
 | Feature | smart_pagination | auto_suggest_box (planned) |
 |---------|-----------------|---------------------------|
-| Cubit support | Yes | Yes (v0.1.0) |
-| Bloc support | Yes | Yes (v0.1.0) |
+| Cubit support | Yes | Yes (v0.1.1) |
+| Bloc support | Yes | Yes (v0.1.1) |
 | Debouncing | Manual | Built-in |
 | Caching | No | Yes (LRU with TTL) |
 | Retry logic | Yes | Yes |

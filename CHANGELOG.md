@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 #### Core Widget - FluentAutoSuggestBox
+
 - `FluentAutoSuggestBox<T>` - Main autocomplete widget with generic type support
 - `FluentAutoSuggestBox.form()` - Form-enabled constructor with validation support
 - Debounced search with configurable delay (default: 300ms)
@@ -22,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Keyboard type and input formatters support
 
 #### State Management - AutoSuggestController
+
 - `AutoSuggestController<T>` - Centralized state management
 - Debounce timer management
 - Loading/error state tracking
@@ -32,6 +34,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Proper disposal and cleanup
 
 #### Caching System - SearchResultsCache
+
 - `SearchResultsCache<T>` - LRU cache implementation
 - Time-To-Live (TTL) expiration for cached entries
 - Automatic LRU eviction when cache is full
@@ -40,6 +43,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `CacheStats` class for detailed metrics
 
 #### Item Model - FluentAutoSuggestBoxItem
+
 - Generic type support for any data model
 - Label and custom child widget support
 - Subtitle widget for additional information
@@ -49,6 +53,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Enabled/disabled state
 
 #### Overlay System - AutoSuggestOverlay
+
 - Smooth overlay positioning with CompositedTransformFollower
 - Race condition prevention for async searches
 - Automatic scroll to selected item
@@ -57,6 +62,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Bidirectional display support
 
 #### Keyboard Navigation
+
 - Arrow Up/Down for item selection
 - Enter to confirm selection
 - Escape to close overlay
@@ -64,6 +70,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Keyboard shortcuts for advanced search
 
 #### Advanced Search Dialog
+
 - `AdvancedSearchDialog<T>` - Full-featured search dialog
 - `AdvancedSearchDialog.show()` - Single selection mode
 - `AdvancedSearchDialog.showMultiSelect()` - Multi-selection mode
@@ -75,6 +82,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Keyboard shortcut trigger (default: F3)
 
 #### Configuration Classes
+
 - `AdvancedSearchConfig` - Main dialog configuration
 - `AdvancedSearchTheme` - Visual theming (colors, spacing, radius)
 - `AdvancedSearchIcons` - Icon customization
@@ -82,11 +90,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `AdvancedSearchAnimation` - Animation settings
 
 #### Common Utilities
+
 - `FluentTextField` - Fluent-styled text field wrapper
 - `FluentTextFormField` - Form field with validation support
 - `ValidatorFormField` - Custom form field with error display
 
 #### Performance Optimizations
+
 - Reduced widget rebuilds (only when necessary)
 - Efficient memory usage with proper disposal
 - Smart caching with prefix matching
@@ -94,12 +104,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Race condition prevention for async operations
 
 #### Accessibility
+
 - Semantic labels throughout
 - Screen reader support
 - Proper focus management
 - ARIA-like attributes
 
 #### BLoC/Cubit State Management
+
 - `FluentAutoSuggestBoxCubit<T>` - Cubit for managing FluentAutoSuggestBox state
 - `FluentAutoSuggestBoxState<T>` - State class with:
   - `items` - List of suggestion items
@@ -114,6 +126,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Helper methods: `reset`, `clear`, `search`, `getItemAt`, `getItemByValue`
 
 ### Dependencies
+
 - fluent_ui: ^4.13.0 - Fluent UI design system
 - flutter_bloc: ^8.1.6 - BLoC state management
 - equatable: ^2.0.5 - Value equality for states
@@ -126,6 +139,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### [0.2.0] - Planned
 
 #### Planned Features
+
 - Pagination support for large datasets
 - RTL language improvements
 - Voice search support

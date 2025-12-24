@@ -27,7 +27,7 @@ Add this to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  auto_suggest_box: ^0.1.0
+  auto_suggest_box: ^0.1.1
 ```
 
 Then run:
