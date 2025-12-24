@@ -620,21 +620,29 @@ class FluentAutoSuggestBoxState<T> extends State<FluentAutoSuggestBox<T>> {
     final screenHeight =
         MediaQuery.sizeOf(context).height -
         MediaQuery.viewPaddingOf(context).bottom;
-    final overlayY = globalOffset.dy + box.size.height;
-    final maxHeight = (screenHeight - overlayY).clamp(
-      0.0,
-      widget.maxPopupHeight,
-    );
+
+    // Calculate available space below and above
+    final spaceBelow = screenHeight - (globalOffset.dy + box.size.height);
+    final spaceAbove = globalOffset.dy - MediaQuery.viewPaddingOf(context).top;
+
+    // Determine direction: show above if space below < 300 and space above is larger
+    final effectiveDirection = (spaceBelow < 300 && spaceAbove > spaceBelow)
+        ? AutoSuggestBoxDirection.above
+        : widget.direction;
+
+    final maxHeight = effectiveDirection == AutoSuggestBoxDirection.below
+        ? spaceBelow.clamp(0.0, widget.maxPopupHeight)
+        : spaceAbove.clamp(0.0, widget.maxPopupHeight);
 
     return Positioned(
       width: box.size.width,
       child: CompositedTransformFollower(
         link: _layerLink,
         showWhenUnlinked: false,
-        targetAnchor: widget.direction == AutoSuggestBoxDirection.below
+        targetAnchor: effectiveDirection == AutoSuggestBoxDirection.below
             ? Alignment.bottomCenter
             : Alignment.topCenter,
-        followerAnchor: widget.direction == AutoSuggestBoxDirection.below
+        followerAnchor: effectiveDirection == AutoSuggestBoxDirection.below
             ? Alignment.topCenter
             : Alignment.bottomCenter,
         offset: widget.offset ?? const Offset(0, 0.8),
@@ -652,7 +660,7 @@ class FluentAutoSuggestBoxState<T> extends State<FluentAutoSuggestBox<T>> {
           onSelected: _handleItemSelected,
           isLoading: _autoSuggestController.isLoading,
           tileHeight: widget.tileHeight,
-          direction: widget.direction,
+          direction: effectiveDirection,
           focusNode: _focusNode,
           onError: widget.onError,
         ),
@@ -675,21 +683,29 @@ class FluentAutoSuggestBoxState<T> extends State<FluentAutoSuggestBox<T>> {
     final screenHeight =
         MediaQuery.sizeOf(context).height -
         MediaQuery.viewPaddingOf(context).bottom;
-    final overlayY = globalOffset.dy + box.size.height;
-    final maxHeight = (screenHeight - overlayY).clamp(
-      0.0,
-      widget.maxPopupHeight,
-    );
+
+    // Calculate available space below and above
+    final spaceBelow = screenHeight - (globalOffset.dy + box.size.height);
+    final spaceAbove = globalOffset.dy - MediaQuery.viewPaddingOf(context).top;
+
+    // Determine direction: show above if space below < 300 and space above is larger
+    final effectiveDirection = (spaceBelow < 300 && spaceAbove > spaceBelow)
+        ? AutoSuggestBoxDirection.above
+        : widget.direction;
+
+    final maxHeight = effectiveDirection == AutoSuggestBoxDirection.below
+        ? spaceBelow.clamp(0.0, widget.maxPopupHeight)
+        : spaceAbove.clamp(0.0, widget.maxPopupHeight);
 
     return Positioned(
       width: box.size.width,
       child: CompositedTransformFollower(
         link: _layerLink,
         showWhenUnlinked: false,
-        targetAnchor: widget.direction == AutoSuggestBoxDirection.below
+        targetAnchor: effectiveDirection == AutoSuggestBoxDirection.below
             ? Alignment.bottomCenter
             : Alignment.topCenter,
-        followerAnchor: widget.direction == AutoSuggestBoxDirection.below
+        followerAnchor: effectiveDirection == AutoSuggestBoxDirection.below
             ? Alignment.topCenter
             : Alignment.bottomCenter,
         offset: widget.offset ?? const Offset(0, 0.8),
