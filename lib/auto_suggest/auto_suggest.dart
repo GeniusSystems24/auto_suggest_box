@@ -18,12 +18,14 @@ export 'auto_suggest_item.dart';
 export 'auto_suggest_cache.dart';
 export 'auto_suggest_controller.dart';
 export 'auto_suggest_overlay.dart';
+export 'auto_suggest_theme.dart';
 
 // Import for internal use
 import 'auto_suggest_item.dart';
 import 'auto_suggest_cache.dart';
 import 'auto_suggest_controller.dart';
 import 'auto_suggest_overlay.dart';
+import 'auto_suggest_theme.dart';
 
 const double kDefaultMaxPopupHeight = 380.0;
 
@@ -1102,6 +1104,10 @@ class FluentAutoSuggestBoxState<T> extends State<FluentAutoSuggestBox<T>> {
   }
 
   Widget _buildTextField() {
+    final theme = Theme.of(context);
+    final autoSuggestTheme = theme.extension<FluentAutoSuggestThemeData>();
+    final useMaterial = autoSuggestTheme?.designSystem == AutoSuggestDesignSystem.material;
+
     // Build suffix widget based on mode
     Widget? suffixWidget;
     if (_isCubitMode) {
@@ -1109,37 +1115,75 @@ class FluentAutoSuggestBoxState<T> extends State<FluentAutoSuggestBox<T>> {
         mainAxisSize: MainAxisSize.min,
         children: [
           if (widget.clearButtonEnabled && _textController.text.isNotEmpty)
-            IconButton(
-              icon: const Icon(FluentIcons.clear, size: 14),
-              onPressed: () {
-                _textController.clear();
-                widget.cubit!.clear();
-                _dismissOverlay();
-              },
-            ),
+            useMaterial
+                ? Material(
+                    type: MaterialType.transparency,
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(16),
+                      onTap: () {
+                        _textController.clear();
+                        widget.cubit!.clear();
+                        _dismissOverlay();
+                      },
+                      child: Icon(
+                        Icons.clear,
+                        size: 18,
+                        color: autoSuggestTheme?.clearButtonColor,
+                      ),
+                    ),
+                  )
+                : IconButton(
+                    icon: Icon(
+                      FluentIcons.clear,
+                      size: 14,
+                      color: autoSuggestTheme?.clearButtonColor,
+                    ),
+                    onPressed: () {
+                      _textController.clear();
+                      widget.cubit!.clear();
+                      _dismissOverlay();
+                    },
+                  ),
           BlocBuilder<AutoSuggestCubit<T>, AutoSuggestState<T>>(
             bloc: widget.cubit,
             builder: (context, state) {
               if (state is AutoSuggestLoading) {
-                return const Padding(
-                  padding: EdgeInsets.only(right: 8),
+                return Padding(
+                  padding: const EdgeInsets.only(right: 8),
                   child: SizedBox(
                     width: 16,
                     height: 16,
-                    child: ProgressRing(strokeWidth: 2),
+                    child: useMaterial
+                        ? CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: autoSuggestTheme?.loadingIndicatorColor,
+                          )
+                        : ProgressRing(
+                            strokeWidth: 2,
+                            activeColor: autoSuggestTheme?.loadingIndicatorColor,
+                          ),
                   ),
                 );
               }
-              return const Icon(Icons.arrow_drop_down);
+              return Icon(
+                Icons.arrow_drop_down,
+                color: autoSuggestTheme?.dropdownIconColor,
+              );
             },
           ),
         ],
       );
     } else {
-      suffixWidget = widget.decoration?.suffix ?? const Icon(Icons.arrow_drop_down);
+      suffixWidget = widget.decoration?.suffix ??
+          Icon(
+            Icons.arrow_drop_down,
+            color: autoSuggestTheme?.dropdownIconColor,
+          );
     }
 
-    final decoration = (widget.decoration ?? InputDecoration()).copyWith(
+    // Use theme decoration or widget decoration
+    final baseDecoration = autoSuggestTheme?.textFieldDecoration ?? widget.decoration ?? const InputDecoration();
+    final decoration = baseDecoration.copyWith(
       suffix: suffixWidget,
       prefix: widget.decoration?.prefix == null
           ? null
@@ -1149,6 +1193,16 @@ class FluentAutoSuggestBoxState<T> extends State<FluentAutoSuggestBox<T>> {
             ),
     );
 
+    // Use Material components
+    if (useMaterial) {
+      return _buildMaterialTextField(decoration, autoSuggestTheme);
+    }
+
+    // Use Fluent components (default)
+    return _buildFluentTextField(decoration, autoSuggestTheme);
+  }
+
+  Widget _buildFluentTextField(InputDecoration decoration, FluentAutoSuggestThemeData? themeData) {
     if (_isFormField) {
       return FluentTextFormField(
         key: _textBoxKey,
@@ -1157,12 +1211,12 @@ class FluentAutoSuggestBoxState<T> extends State<FluentAutoSuggestBox<T>> {
         autofocus: widget.autofocus,
         enabled: widget.enabled,
         readOnly: widget.readOnly,
-        style: widget.style,
+        style: themeData?.textFieldStyle ?? widget.style,
         decoration: decoration,
-        cursorColor: widget.cursorColor,
-        cursorHeight: widget.cursorHeight,
-        cursorRadius: widget.cursorRadius,
-        cursorWidth: widget.cursorWidth,
+        cursorColor: themeData?.textFieldCursorColor ?? widget.cursorColor,
+        cursorHeight: themeData?.textFieldCursorHeight ?? widget.cursorHeight,
+        cursorRadius: themeData?.textFieldCursorRadius ?? widget.cursorRadius,
+        cursorWidth: themeData?.textFieldCursorWidth ?? widget.cursorWidth,
         showCursor: widget.showCursor,
         scrollPadding: widget.scrollPadding,
         selectionHeightStyle: widget.selectionHeightStyle,
@@ -1189,12 +1243,78 @@ class FluentAutoSuggestBoxState<T> extends State<FluentAutoSuggestBox<T>> {
         autofocus: widget.autofocus,
         enabled: widget.enabled,
         readOnly: widget.readOnly,
-        style: widget.style,
+        style: themeData?.textFieldStyle ?? widget.style,
         decoration: decoration,
-        cursorColor: widget.cursorColor,
-        cursorHeight: widget.cursorHeight,
-        cursorRadius: widget.cursorRadius,
-        cursorWidth: widget.cursorWidth,
+        cursorColor: themeData?.textFieldCursorColor ?? widget.cursorColor,
+        cursorHeight: themeData?.textFieldCursorHeight ?? widget.cursorHeight,
+        cursorRadius: themeData?.textFieldCursorRadius ?? widget.cursorRadius,
+        cursorWidth: themeData?.textFieldCursorWidth ?? widget.cursorWidth,
+        showCursor: widget.showCursor,
+        scrollPadding: widget.scrollPadding,
+        selectionHeightStyle: widget.selectionHeightStyle,
+        selectionWidthStyle: widget.selectionWidthStyle,
+        textInputAction: widget.textInputAction,
+        keyboardAppearance: widget.keyboardAppearance,
+        inputFormatters: widget.inputFormatters,
+        keyboardType: widget.keyboardType,
+        maxLength: widget.maxLength,
+        onEditingComplete: widget.onEditingComplete,
+        onChanged: (text) {
+          widget.onChanged?.call(text, TextChangedReason.userInput);
+        },
+        onTapOutside: (_) => _focusNode.unfocus(),
+        onSubmitted: _handleSubmitted,
+      );
+    }
+  }
+
+  Widget _buildMaterialTextField(InputDecoration decoration, FluentAutoSuggestThemeData? themeData) {
+    if (_isFormField) {
+      return TextFormField(
+        key: _textBoxKey,
+        controller: _textController,
+        focusNode: _focusNode,
+        autofocus: widget.autofocus,
+        enabled: widget.enabled,
+        readOnly: widget.readOnly,
+        style: themeData?.textFieldStyle ?? widget.style,
+        decoration: decoration,
+        cursorColor: themeData?.textFieldCursorColor ?? widget.cursorColor,
+        cursorHeight: themeData?.textFieldCursorHeight ?? widget.cursorHeight,
+        cursorRadius: themeData?.textFieldCursorRadius ?? widget.cursorRadius,
+        cursorWidth: themeData?.textFieldCursorWidth ?? widget.cursorWidth,
+        showCursor: widget.showCursor,
+        scrollPadding: widget.scrollPadding,
+        selectionHeightStyle: widget.selectionHeightStyle,
+        selectionWidthStyle: widget.selectionWidthStyle,
+        textInputAction: widget.textInputAction,
+        keyboardAppearance: widget.keyboardAppearance,
+        inputFormatters: widget.inputFormatters,
+        keyboardType: widget.keyboardType,
+        maxLength: widget.maxLength,
+        onEditingComplete: widget.onEditingComplete,
+        onChanged: (text) {
+          widget.onChanged?.call(text, TextChangedReason.userInput);
+        },
+        onTapOutside: (_) => _focusNode.unfocus(),
+        onFieldSubmitted: _handleSubmitted,
+        validator: (_) => widget.validator?.call(_textController.text),
+        autovalidateMode: widget.autovalidateMode,
+      );
+    } else {
+      return TextField(
+        key: _textBoxKey,
+        controller: _textController,
+        focusNode: _focusNode,
+        autofocus: widget.autofocus,
+        enabled: widget.enabled,
+        readOnly: widget.readOnly,
+        style: themeData?.textFieldStyle ?? widget.style,
+        decoration: decoration,
+        cursorColor: themeData?.textFieldCursorColor ?? widget.cursorColor,
+        cursorHeight: themeData?.textFieldCursorHeight ?? widget.cursorHeight,
+        cursorRadius: themeData?.textFieldCursorRadius ?? widget.cursorRadius,
+        cursorWidth: themeData?.textFieldCursorWidth ?? widget.cursorWidth,
         showCursor: widget.showCursor,
         scrollPadding: widget.scrollPadding,
         selectionHeightStyle: widget.selectionHeightStyle,

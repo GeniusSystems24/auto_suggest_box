@@ -16,14 +16,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `auto_suggest_cache.dart` - LRU cache implementation
   - `auto_suggest_controller.dart` - State management controller
   - `auto_suggest_overlay.dart` - Overlay widget for suggestions
+  - `auto_suggest_theme.dart` - Theme extension for customization
 
 ### Fixed
 
 #### Overlay Improvements
 - **Smart overlay positioning**: Automatically shows overlay above when space below < 300px and space above is larger
 - **Empty results display**: Shows "No results found" when server search returns empty instead of stuck on "Searching..."
+- **Reversed items order for above overlay**: When showing overlay above, items are now reversed so the first item appears at the bottom (closest to the text field)
 
 ### Added
+
+#### FluentAutoSuggestThemeData (Theme Extension)
+- New `FluentAutoSuggestThemeData` extending `ThemeExtension` for comprehensive theming
+- `AutoSuggestDesignSystem` enum to switch between Fluent and Material design
+- Text field theming: decoration, style, cursor color/width/height/radius, fill color, border radius
+- Overlay theming: background color, card color, border radius, shadows, elevation
+- Item theming: background colors (normal/selected/hover), text styles, padding, height
+- Loading state theming: indicator color, text style
+- No results theming: text styles, icon, icon color
+- General theming: icon color, clear button color, dropdown icon color
+- Preset themes: `light()`, `dark()`, `material()`
+
+#### Material Components Support
+- Support for Material Design components (TextField, TextFormField)
+- Set `designSystem: AutoSuggestDesignSystem.material` in theme to use Material components
+- Automatic switching between Fluent and Material loading indicators
+- Material-styled clear button with InkWell ripple effect
 
 #### FluentAutoSuggestBoxCubit (Widget State Management)
 - New `FluentAutoSuggestBoxCubit<T>` for simple widget state management

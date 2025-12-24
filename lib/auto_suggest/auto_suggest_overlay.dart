@@ -3,6 +3,7 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:gap/gap.dart';
 
 import 'auto_suggest_item.dart';
+import 'auto_suggest_theme.dart';
 
 enum AutoSuggestBoxDirection { below, above }
 
@@ -66,6 +67,31 @@ class AutoSuggestOverlayState<T> extends State<AutoSuggestOverlay<T>> {
   String? _pendingSearch;
   bool _isSearching = false;
   bool _searchCompletedWithNoResults = false;
+
+  /// Get items in display order (reversed when showing above)
+  List<FluentAutoSuggestBoxItem<T>> get _displayItems {
+    final items = _sortedItems.toList();
+    if (widget.direction == AutoSuggestBoxDirection.above) {
+      return items.reversed.toList();
+    }
+    return items;
+  }
+
+  /// Convert display index to actual index in _sortedItems
+  int _toActualIndex(int displayIndex) {
+    if (widget.direction == AutoSuggestBoxDirection.above) {
+      return _sortedItems.length - 1 - displayIndex;
+    }
+    return displayIndex;
+  }
+
+  /// Convert actual index to display index
+  int _toDisplayIndex(int actualIndex) {
+    if (widget.direction == AutoSuggestBoxDirection.above) {
+      return _sortedItems.length - 1 - actualIndex;
+    }
+    return actualIndex;
+  }
 
   @override
   void initState() {
@@ -176,8 +202,8 @@ class AutoSuggestOverlayState<T> extends State<AutoSuggestOverlay<T>> {
     }
   }
 
-  void _selectItem(int index) {
-    if (index < 0 || index >= _sortedItems.length) return;
+  void _selectItem(int actualIndex) {
+    if (actualIndex < 0 || actualIndex >= _sortedItems.length) return;
 
     setState(() {
       // Unselect all
@@ -186,19 +212,19 @@ class AutoSuggestOverlayState<T> extends State<AutoSuggestOverlay<T>> {
       }
 
       // Select new item
-      _selectedIndex = index;
-      final item = _sortedItems.elementAt(index);
+      _selectedIndex = actualIndex;
+      final item = _sortedItems.elementAt(actualIndex);
       item.isSelected = true;
     });
 
-    // Scroll to item
-    _scrollToIndex(index);
+    // Scroll to item (use display index for scrolling)
+    _scrollToDisplayIndex(_toDisplayIndex(actualIndex));
   }
 
-  void _scrollToIndex(int index) {
+  void _scrollToDisplayIndex(int displayIndex) {
     if (!_scrollController.hasClients) return;
 
-    final offset = widget.tileHeight * index;
+    final offset = widget.tileHeight * displayIndex;
     _scrollController.animateTo(
       offset,
       duration: const Duration(milliseconds: 100),
@@ -210,6 +236,12 @@ class AutoSuggestOverlayState<T> extends State<AutoSuggestOverlay<T>> {
   Widget build(BuildContext context) {
     final fluentTheme = FluentTheme.of(context);
     final theme = Theme.of(context);
+    final autoSuggestTheme = theme.extension<FluentAutoSuggestThemeData>();
+
+    final backgroundColor = autoSuggestTheme?.overlayBackgroundColor ??
+        fluentTheme.acrylicBackgroundColor.withAlpha((255 * .85).toInt());
+    final cardColor = autoSuggestTheme?.overlayCardColor ?? fluentTheme.cardColor;
+    final borderRadius = autoSuggestTheme?.overlayBorderRadius ?? 4.0;
 
     return TextFieldTapRegion(
       child: Container(
@@ -221,27 +253,25 @@ class AutoSuggestOverlayState<T> extends State<AutoSuggestOverlay<T>> {
         constraints: BoxConstraints(maxHeight: widget.maxHeight),
         clipBehavior: Clip.antiAlias,
         decoration: ShapeDecoration(
-          color: fluentTheme.acrylicBackgroundColor.withAlpha(
-            (255 * .85).toInt(),
-          ),
+          color: backgroundColor,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.vertical(
               bottom: widget.direction == AutoSuggestBoxDirection.below
-                  ? const Radius.circular(4.0)
+                  ? Radius.circular(borderRadius)
                   : Radius.zero,
               top: widget.direction == AutoSuggestBoxDirection.above
-                  ? const Radius.circular(4.0)
+                  ? Radius.circular(borderRadius)
                   : Radius.zero,
             ),
           ),
-          shadows: kElevationToShadow[1],
+          shadows: autoSuggestTheme?.overlayShadows ?? kElevationToShadow[1],
         ),
         child: Card(
           margin: EdgeInsets.zero,
           padding: EdgeInsets.zero,
           borderRadius: BorderRadius.zero,
           child: Container(
-            color: fluentTheme.cardColor,
+            color: cardColor,
             child: _buildContent(theme),
           ),
         ),
@@ -336,6 +366,8 @@ class AutoSuggestOverlayState<T> extends State<AutoSuggestOverlay<T>> {
   }
 
   Widget _buildItemsList() {
+    final displayItems = _displayItems;
+
     return Semantics(
       label: '${_sortedItems.length} results available',
       container: true,
@@ -343,12 +375,12 @@ class AutoSuggestOverlayState<T> extends State<AutoSuggestOverlay<T>> {
         itemExtent: widget.tileHeight,
         controller: _scrollController,
         shrinkWrap: true,
-        reverse: widget.direction == AutoSuggestBoxDirection.above,
         padding: const EdgeInsetsDirectional.only(bottom: 4.0),
-        itemCount: _sortedItems.length,
-        itemBuilder: (context, index) {
-          final item = _sortedItems.elementAt(index);
-          final isSelected = index == _selectedIndex || item.isSelected;
+        itemCount: displayItems.length,
+        itemBuilder: (context, displayIndex) {
+          final item = displayItems[displayIndex];
+          final actualIndex = _toActualIndex(displayIndex);
+          final isSelected = actualIndex == _selectedIndex || item.isSelected;
 
           return Semantics(
             label:
@@ -372,16 +404,34 @@ class AutoSuggestOverlayState<T> extends State<AutoSuggestOverlay<T>> {
   // Public method for keyboard navigation
   void selectNext() {
     if (_sortedItems.isEmpty) return;
-    final nextIndex = (_selectedIndex + 1) % _sortedItems.length;
-    _selectItem(nextIndex);
+
+    if (widget.direction == AutoSuggestBoxDirection.above) {
+      // When showing above, "next" goes to a smaller actual index (visually down, toward text field)
+      final nextIndex = _selectedIndex <= 0
+          ? _sortedItems.length - 1
+          : _selectedIndex - 1;
+      _selectItem(nextIndex);
+    } else {
+      // Normal direction: next increments the index
+      final nextIndex = (_selectedIndex + 1) % _sortedItems.length;
+      _selectItem(nextIndex);
+    }
   }
 
   void selectPrevious() {
     if (_sortedItems.isEmpty) return;
-    final prevIndex = _selectedIndex <= 0
-        ? _sortedItems.length - 1
-        : _selectedIndex - 1;
-    _selectItem(prevIndex);
+
+    if (widget.direction == AutoSuggestBoxDirection.above) {
+      // When showing above, "previous" goes to a larger actual index (visually up)
+      final prevIndex = (_selectedIndex + 1) % _sortedItems.length;
+      _selectItem(prevIndex);
+    } else {
+      // Normal direction: previous decrements the index
+      final prevIndex = _selectedIndex <= 0
+          ? _sortedItems.length - 1
+          : _selectedIndex - 1;
+      _selectItem(prevIndex);
+    }
   }
 
   FluentAutoSuggestBoxItem<T>? getSelectedItem() {
