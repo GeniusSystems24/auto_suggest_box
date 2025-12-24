@@ -5,7 +5,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'form_field.dart';
+import 'validator_form_field.dart';
 
 class FluentTextFormField extends StatelessWidget {
   const FluentTextFormField({

@@ -67,13 +67,10 @@
 ///   labelBuilder: (product) => product.name,
 /// )
 /// ```
-library auto_suggest_box;
+library;
 
 // Core auto suggest components
 export 'auto_suggest/auto_suggest.dart';
-
-// BLoC/Cubit state management
-export 'bloc/bloc.dart';
 
 // Advanced search components
 export 'advanced_auto_suggest/auto_suggest_advanced.dart';
@@ -81,4 +78,4 @@ export 'advanced_auto_suggest/auto_suggest_advanced.dart';
 // Common utilities
 export 'common/text.dart';
 export 'common/text_form.dart';
-export 'common/form_field.dart';
+export 'common/validator_form_field.dart';
