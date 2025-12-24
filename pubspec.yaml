@@ -1,6 +1,6 @@
 name: auto_suggest_box
 description: "A highly customizable, performance-optimized auto-suggest/autocomplete widget for Flutter with Fluent UI design. Features debounced search, LRU caching, keyboard navigation, form validation, advanced search dialog, and BLoC/Cubit state management."
-version: 0.1.1
+version: 0.1.2
 homepage: https://github.com/example/auto_suggest_box
 repository: https://github.com/example/auto_suggest_box
 issue_tracker: https://github.com/example/auto_suggest_box/issues
