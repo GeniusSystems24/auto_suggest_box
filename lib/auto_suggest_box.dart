@@ -39,9 +39,6 @@ export 'auto_suggest/auto_suggest.dart';
 // Advanced search components
 export 'advanced_auto_suggest/auto_suggest_advanced.dart';
 
-// BLoC/Cubit state management
-export 'bloc/bloc.dart';
-
 // Common utilities
 export 'common/text.dart';
 export 'common/text_form.dart';

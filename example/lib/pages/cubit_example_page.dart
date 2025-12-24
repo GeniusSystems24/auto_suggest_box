@@ -1,7 +1,7 @@
+import 'package:auto_suggest_box/bloc/bloc.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/material.dart' show InputDecoration, Chip;
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:auto_suggest_box/auto_suggest_box.dart';
 import 'package:gap/gap.dart';
 
 import '../data/sample_data.dart';
