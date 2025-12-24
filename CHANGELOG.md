@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.0.1] - 2024-01-01
+## [0.1.0] - 2024-12-23
 
 ### Added
 
@@ -109,11 +109,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `AutoSuggestError` - Error with retry support
 - `AutoSuggestConfig` - Configuration for debounce, cache, retry
 - `RetryConfig` - Exponential backoff retry configuration
-- `BlocAutoSuggestBox<T>` - Widget with built-in cubit integration
+- `BlocAutoSuggestBox<T>` - Standalone widget with built-in cubit integration
 - `AutoSuggestBlocBuilder<T>` - Convenience builder for exhaustive matching
 - Data expiration support (like smart_pagination's dataAge)
 - Cache hit rate and search statistics
 - Automatic prefix matching for cache lookups
+
+#### Integrated Cubit Mode
+- `FluentAutoSuggestBox<T>.cubit()` - Constructor for cubit-based state management
+- Seamless integration with FluentAutoSuggestBox using cubit for data fetching
+- `cubitItemBuilder` - Custom item builder for cubit mode
+- `labelBuilder` - Function to extract label from item
+- `onCubitSelected` - Callback when item is selected in cubit mode
+- `cubitFilters` - Pass filters to cubit search
+- `showCubitStats` - Display cache statistics bar
+- `cubitLoadingBuilder`, `cubitErrorBuilder`, `cubitEmptyBuilder` - Custom builders for states
+- Loading indicator in text field suffix during search
+- Clear button integration with cubit.clear()
+- Keyboard navigation support (Arrow keys, Enter, Escape)
 
 ### Dependencies
 - fluent_ui: ^4.13.0 - Fluent UI design system
@@ -125,7 +138,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Future Releases
 
-### [0.1.0] - Planned
+### [0.2.0] - Planned
 
 #### Planned Features
 - Pagination support for large datasets
@@ -133,11 +146,3 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Voice search support
 - Grouped suggestions
 - Inline suggestions (ghost text)
-
----
-
-## Migration Guides
-
-### From 0.0.x to 0.1.0
-
-_Migration guide will be added when 0.1.0 is released._

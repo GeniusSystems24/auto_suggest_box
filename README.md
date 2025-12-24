@@ -27,7 +27,7 @@ Add this to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  auto_suggest_box: ^0.0.1
+  auto_suggest_box: ^0.1.0
 ```
 
 Then run:
@@ -99,7 +99,7 @@ FluentAutoSuggestBox<String>.form(
 
 ## Cubit/BLoC State Management
 
-Similar to [smart_pagination](https://pub.dev/packages/smart_pagination), this package provides a Cubit-based state management solution.
+Similar to [smart_pagination](https://pub.dev/packages/smart_pagination), this package provides a Cubit-based state management solution integrated directly into `FluentAutoSuggestBox`.
 
 ### Creating a Cubit
 
@@ -120,7 +120,32 @@ final productsCubit = AutoSuggestCubit<Product>(
 );
 ```
 
-### Using BlocAutoSuggestBox
+### Using FluentAutoSuggestBox.cubit (Recommended)
+
+The integrated cubit mode provides the same FluentAutoSuggestBox experience with Cubit state management:
+
+```dart
+FluentAutoSuggestBox<Product>.cubit(
+  cubit: productsCubit,
+  cubitItemBuilder: (context, product, isSelected, onTap) {
+    return ListTile(
+      title: Text(product.name),
+      subtitle: Text('\$${product.price}'),
+      selected: isSelected,
+      onPressed: onTap,
+    );
+  },
+  labelBuilder: (product) => product.name,
+  onCubitSelected: (product) {
+    print('Selected: ${product.name}');
+  },
+  showCubitStats: true,  // Show cache statistics
+)
+```
+
+### Using BlocAutoSuggestBox (Standalone)
+
+You can also use the standalone `BlocAutoSuggestBox` widget:
 
 ```dart
 BlocAutoSuggestBox<Product>(
