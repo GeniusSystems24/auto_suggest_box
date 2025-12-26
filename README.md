@@ -4,7 +4,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![Flutter](https://img.shields.io/badge/Flutter-%3E%3D1.17.0-blue.svg)](https://flutter.dev)
 [![Platform](https://img.shields.io/badge/Platform-All-blueviolet?style=for-the-badge)](https://flutter.dev)
-[![Live Demo](https://img.shields.io/badge/🚀_Live_Demo-View_Online-success?style=for-the-badge)](https://geniussystems24.github.io/auto_suggest_box_example)
+[![Live Demo](https://img.shields.io/badge/🚀_Live_Demo-View_Online-success?style=for-the-badge)](https://geniussystems24.github.io/auto_suggest_box)
 
 A highly customizable, performance-optimized auto-suggest/autocomplete widget for Flutter with Fluent UI design. Features include debounced search, LRU caching, keyboard navigation, form validation, advanced search dialog, and BLoC/Cubit state management (similar to [smart_pagination](https://pub.dev/packages/smart_pagination)).
 
@@ -29,7 +29,7 @@ Add this to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  auto_suggest_box: ^0.1.4
+  auto_suggest_box: ^0.1.5
 ```
 
 Then run:
