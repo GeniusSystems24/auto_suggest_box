@@ -3,13 +3,14 @@
 [![pub package](https://img.shields.io/pub/v/auto_suggest_box.svg)](https://pub.dev/packages/auto_suggest_box)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![Flutter](https://img.shields.io/badge/Flutter-%3E%3D1.17.0-blue.svg)](https://flutter.dev)
-[![Platform](https://img.shields.io/badge/Platform-All-blueviolet?style=for-the-badge)](https://flutter.dev)
-[![Live Demo](https://img.shields.io/badge/🚀_Live_Demo-View_Online-success?style=for-the-badge)](https://geniussystems24.github.io/auto_suggest_box_example)
 
-A highly customizable, performance-optimized auto-suggest/autocomplete widget for Flutter with Fluent UI design. Features include debounced search, LRU caching, keyboard navigation, form validation, advanced search dialog, and BLoC/Cubit state management (similar to [smart_pagination](https://pub.dev/packages/smart_pagination)).
+A highly customizable, performance-optimized auto-suggest/autocomplete widget for Flutter with Fluent UI design. Supports both **Fluent UI** and **Material Design** components.
 
 ## Features
 
+- **Dual Design System** - Switch between Fluent UI and Material Design
+- **Theme Extension** - Full theming support via `FluentAutoSuggestThemeData`
+- **Smart Overlay Positioning** - Auto-shows above when space below < 300px
 - **Debounced Search** - Configurable delay to reduce API calls
 - **LRU Caching** - Intelligent caching with TTL (Time To Live) expiration
 - **Keyboard Navigation** - Full support for Arrow keys, Tab, Escape, and Enter
@@ -19,8 +20,8 @@ A highly customizable, performance-optimized auto-suggest/autocomplete widget fo
 - **Custom Builders** - Full control over item rendering
 - **Accessibility** - Semantic labels and screen reader support
 - **Recent Searches** - Track and display search history
-- **Advanced Search Dialog** - Full-featured search with filters, pagination, and multiple view modes
-- **BLoC/Cubit Support** - State management similar to smart_pagination
+- **Advanced Search Dialog** - Full-featured search with filters and pagination
+- **BLoC/Cubit Support** - State management integration
 - **Performance Optimized** - Reduced rebuilds, efficient memory usage
 
 ## Installation
@@ -29,7 +30,7 @@ Add this to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  auto_suggest_box: ^0.1.4
+  auto_suggest_box: ^0.1.3
 ```
 
 Then run:
@@ -99,83 +100,154 @@ FluentAutoSuggestBox<String>.form(
 )
 ```
 
+## Theme Extension
+
+Use `FluentAutoSuggestThemeData` to customize the appearance globally:
+
+### Fluent UI Theme (Default)
+
+```dart
+MaterialApp(
+  theme: ThemeData(
+    extensions: [
+      FluentAutoSuggestThemeData.light(),
+    ],
+  ),
+)
+```
+
+### Material Design Theme
+
+```dart
+MaterialApp(
+  theme: ThemeData(
+    extensions: [
+      FluentAutoSuggestThemeData(
+        designSystem: AutoSuggestDesignSystem.material,
+        textFieldDecoration: InputDecoration(
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+          filled: true,
+          contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        ),
+        overlayBorderRadius: 8.0,
+        overlayElevation: 8.0,
+      ),
+    ],
+  ),
+)
+```
+
+### Custom Theme
+
+```dart
+FluentAutoSuggestThemeData(
+  // Design system
+  designSystem: AutoSuggestDesignSystem.fluent, // or .material
+
+  // Text field theming
+  textFieldDecoration: InputDecoration(...),
+  textFieldStyle: TextStyle(...),
+  textFieldCursorColor: Colors.blue,
+  textFieldFillColor: Colors.grey[100],
+  textFieldBorderRadius: 8.0,
+
+  // Overlay theming
+  overlayBackgroundColor: Colors.white,
+  overlayCardColor: Colors.white,
+  overlayBorderRadius: 4.0,
+  overlayShadows: [BoxShadow(...)],
+  overlayElevation: 8.0,
+
+  // Item theming
+  itemBackgroundColor: Colors.transparent,
+  itemSelectedBackgroundColor: Colors.blue.withOpacity(0.1),
+  itemHoverBackgroundColor: Colors.grey.withOpacity(0.1),
+  itemTextStyle: TextStyle(...),
+  itemSelectedTextStyle: TextStyle(...),
+  itemHeight: 48.0,
+
+  // Loading state
+  loadingIndicatorColor: Colors.blue,
+  loadingTextStyle: TextStyle(...),
+
+  // No results state
+  noResultsTextStyle: TextStyle(...),
+  noResultsIcon: Icons.search_off,
+  noResultsIconColor: Colors.grey,
+
+  // Icons
+  iconColor: Colors.grey[600],
+  clearButtonColor: Colors.grey[500],
+  dropdownIconColor: Colors.grey[600],
+)
+```
+
+### Preset Themes
+
+```dart
+// Light theme (Fluent)
+FluentAutoSuggestThemeData.light()
+
+// Dark theme (Fluent)
+FluentAutoSuggestThemeData.dark()
+
+// Material Design theme
+FluentAutoSuggestThemeData.material(isDark: false)
+```
+
+## Smart Overlay Positioning
+
+The overlay automatically positions itself based on available screen space:
+
+- Shows **below** the text field by default
+- Shows **above** when space below < 300px AND space above is larger
+- When showing above, items are **reversed** so the first item appears at the bottom (closest to the text field)
+
+```dart
+FluentAutoSuggestBox<String>(
+  items: items,
+  direction: AutoSuggestBoxDirection.below, // Default, but auto-adjusts
+  maxPopupHeight: 380.0,
+)
+```
+
 ## Cubit/BLoC State Management
 
-This package provides `FluentAutoSuggestBoxCubit` to manage the state of `FluentAutoSuggestBox` widget.
-
-### Creating a Cubit
+### FluentAutoSuggestBoxCubit (Widget State Management)
 
 ```dart
 final cubit = FluentAutoSuggestBoxCubit<Product>();
-```
 
-### Managing Items
-
-```dart
 // Set items
 cubit.setItems([
   FluentAutoSuggestBoxItem(value: product1, label: 'iPhone'),
   FluentAutoSuggestBoxItem(value: product2, label: 'Samsung'),
-  FluentAutoSuggestBoxItem(value: product3, label: 'Pixel'),
 ]);
 
-// Add item
-cubit.addItem(FluentAutoSuggestBoxItem(value: product4, label: 'OnePlus'));
-
-// Remove item
+// Add/Remove items
+cubit.addItem(FluentAutoSuggestBoxItem(value: product3, label: 'Pixel'));
 cubit.removeItem(item);
-cubit.removeItemByValue(product1);
 
-// Clear all items
-cubit.clearItems();
-```
-
-### Selection
-
-```dart
-// Select an item
+// Selection
 cubit.selectItem(item);
 cubit.selectByValue(product1);
 cubit.selectByIndex(0);
-
-// Clear selection
 cubit.clearSelection();
 
-// Get selected item
-final selected = cubit.state.selectedItem;
-```
-
-### Loading State
-
-```dart
-// Show loading
+// State control
 cubit.setLoading(true);
+cubit.setError('Something went wrong');
+cubit.setEnabled(false);
+cubit.setReadOnly(true);
 
-// Load from server
-final products = await api.getProducts();
-cubit.setItems(products.map((p) =>
-  FluentAutoSuggestBoxItem(value: p, label: p.name)
-).toList());
-
-// Hide loading
-cubit.setLoading(false);
+// Reset
+cubit.reset();
+cubit.clear();
 ```
 
-### Error Handling
-
-```dart
-try {
-  cubit.setLoading(true);
-  final products = await api.getProducts();
-  cubit.setItems(products);
-} catch (e) {
-  cubit.setError(e);
-} finally {
-  cubit.setLoading(false);
-}
-```
-
-### Using with FluentAutoSuggestBox
+### Using with BlocBuilder
 
 ```dart
 BlocBuilder<FluentAutoSuggestBoxCubit<Product>, FluentAutoSuggestBoxState<Product>>(
@@ -189,10 +261,35 @@ BlocBuilder<FluentAutoSuggestBoxCubit<Product>, FluentAutoSuggestBoxState<Produc
           cubit.selectItem(item);
         }
       },
-      loadingBuilder: state.isLoading
-        ? (context) => const ProgressRing()
-        : null,
     );
+  },
+)
+```
+
+### AutoSuggestCubit (Server Search)
+
+```dart
+final cubit = AutoSuggestCubit<Product>(
+  provider: (query, {filters}) async {
+    return await api.searchProducts(query, filters: filters);
+  },
+  cacheDuration: Duration(minutes: 5),
+);
+
+// Use with FluentAutoSuggestBox.cubit()
+FluentAutoSuggestBox<Product>.cubit(
+  cubit: cubit,
+  cubitItemBuilder: (context, product, isSelected, onTap) {
+    return ListTile(
+      title: Text(product.name),
+      subtitle: Text(product.description),
+      selected: isSelected,
+      onPressed: onTap,
+    );
+  },
+  labelBuilder: (product) => product.name,
+  onCubitSelected: (product) {
+    print('Selected: ${product.name}');
   },
 )
 ```
@@ -215,109 +312,14 @@ state.isEnabled       // Is widget enabled
 state.isReadOnly      // Is widget read-only
 ```
 
-### Available Methods
-
-| Method | Description |
-|--------|-------------|
-| `setItems(items)` | Set all items |
-| `addItem(item)` | Add single item |
-| `addItems(items)` | Add multiple items |
-| `removeItem(item)` | Remove item |
-| `removeItemByValue(value)` | Remove by value |
-| `clearItems()` | Clear all items |
-| `selectItem(item)` | Select item |
-| `selectByValue(value)` | Select by value |
-| `selectByIndex(index)` | Select by index |
-| `clearSelection()` | Clear selection |
-| `setText(text)` | Set input text |
-| `clearText()` | Clear input text |
-| `setLoading(bool)` | Set loading state |
-| `setError(error)` | Set error |
-| `clearError()` | Clear error |
-| `setEnabled(bool)` | Enable/disable |
-| `setReadOnly(bool)` | Set read-only |
-| `reset()` | Reset to initial state |
-| `clear()` | Clear selection, text, error |
-| `search(query)` | Search in local items |
-
-### Using BlocBuilder Directly
-
-```dart
-BlocBuilder<AutoSuggestCubit<Product>, AutoSuggestState<Product>>(
-  bloc: productsCubit,
-  builder: (context, state) {
-    return switch (state) {
-      AutoSuggestInitial() => Text('Start typing to search...'),
-      AutoSuggestLoading(:final query) => CircularProgressIndicator(),
-      AutoSuggestLoaded(:final items) => ListView.builder(
-        itemCount: items.length,
-        itemBuilder: (context, index) => Text(items[index].name),
-      ),
-      AutoSuggestEmpty(:final query) => Text('No results for "$query"'),
-      AutoSuggestError(:final error) => Text('Error: $error'),
-    };
-  },
-)
-```
-
-### AutoSuggestBlocBuilder (Convenience Widget)
-
-```dart
-AutoSuggestBlocBuilder<Product>(
-  cubit: productsCubit,
-  onInitial: (context) => Text('Ready to search'),
-  onLoading: (context, query, previousItems) => ProgressRing(),
-  onLoaded: (context, items, query) => ProductList(items: items),
-  onEmpty: (context, query) => Text('No products found'),
-  onError: (context, error, query, previousItems) => ErrorWidget(error),
-)
-```
-
-### State Classes
-
-| State | Properties | Description |
-|-------|------------|-------------|
-| `AutoSuggestInitial` | - | Initial state before any search |
-| `AutoSuggestLoading` | `query`, `previousItems`, `isLoadingMore` | Loading state |
-| `AutoSuggestLoaded` | `items`, `query`, `fetchedAt`, `dataExpiredAt` | Success with data |
-| `AutoSuggestEmpty` | `query`, `searchedAt` | No results found |
-| `AutoSuggestError` | `error`, `query`, `previousItems` | Error state |
-
-### Data Expiration (like smart_pagination)
-
-```dart
-// Check if data is expired
-if (cubit.isDataExpired) {
-  await cubit.refresh();
-}
-
-// Or use automatic check
-await cubit.checkAndRefreshIfExpired();
-
-// Access data age
-final age = cubit.dataAge;  // Duration since last fetch
-```
-
-### Statistics
-
-```dart
-final stats = cubit.stats;
-print('Cache hits: ${stats['cacheHits']}');
-print('Cache misses: ${stats['cacheMisses']}');
-print('Hit rate: ${(stats['cacheHitRate'] * 100).toStringAsFixed(1)}%');
-```
-
 ## API Reference
 
 ### FluentAutoSuggestBox
-
-The main widget for creating auto-suggest input fields.
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
 | `items` | `List<FluentAutoSuggestBoxItem<T>>` | required | List of suggestion items |
 | `controller` | `TextEditingController?` | null | Text controller for the input field |
-| `autoSuggestController` | `AutoSuggestController<T>?` | null | Controller for managing state |
 | `onChanged` | `OnTextChanged<T>?` | null | Callback when text changes |
 | `onSelected` | `ValueChanged<FluentAutoSuggestBoxItem<T>?>?` | null | Callback when item is selected |
 | `itemBuilder` | `ItemBuilder<T>?` | null | Custom widget builder for items |
@@ -330,13 +332,11 @@ The main widget for creating auto-suggest input fields.
 | `debounceDelay` | `Duration` | 300ms | Debounce delay for search |
 | `minSearchLength` | `int` | 2 | Minimum characters to trigger search |
 | `maxPopupHeight` | `double` | 380.0 | Maximum height of suggestion popup |
-| `direction` | `AutoSuggestBoxDirection` | below | Popup direction (above/below) |
+| `direction` | `AutoSuggestBoxDirection` | below | Popup direction (auto-adjusts) |
 | `validator` | `FormFieldValidator<String>?` | null | Form validation function |
 | `autovalidateMode` | `AutovalidateMode` | disabled | Validation mode |
 
 ### FluentAutoSuggestBoxItem
-
-Represents a single suggestion item.
 
 ```dart
 FluentAutoSuggestBoxItem<T>({
@@ -349,55 +349,23 @@ FluentAutoSuggestBoxItem<T>({
 })
 ```
 
-### AutoSuggestController
+### FluentAutoSuggestThemeData
 
-Controller for managing search state and metrics.
-
-```dart
-final controller = AutoSuggestController<String>(
-  debounceDelay: Duration(milliseconds: 300),
-  minSearchLength: 2,
-  maxRecentSearches: 10,
-  enableRecentSearches: true,
-);
-
-// Access state
-print(controller.searchQuery);
-print(controller.isLoading);
-print(controller.recentSearches);
-
-// Get statistics
-final stats = controller.getStats();
-print('Success rate: ${stats['successRate']}');
-
-// Clean up
-controller.dispose();
-```
-
-### SearchResultsCache
-
-LRU cache with automatic expiration.
-
-```dart
-final cache = SearchResultsCache<Product>(
-  maxSize: 100,
-  maxAge: Duration(minutes: 30),
-  enablePrefixMatching: true,
-);
-
-// Cache operations
-cache.set('query', results);
-final cached = cache.get('query');
-cache.clear();
-
-// Get statistics
-final stats = cache.getStats();
-print('Hit rate: ${(stats.hitRate * 100).toStringAsFixed(1)}%');
-```
+| Property | Type | Description |
+|----------|------|-------------|
+| `designSystem` | `AutoSuggestDesignSystem` | fluent or material |
+| `textFieldDecoration` | `InputDecoration?` | Text field decoration |
+| `textFieldStyle` | `TextStyle?` | Text style for input |
+| `overlayBackgroundColor` | `Color?` | Overlay background color |
+| `overlayCardColor` | `Color?` | Overlay card color |
+| `overlayBorderRadius` | `double?` | Overlay border radius |
+| `itemSelectedBackgroundColor` | `Color?` | Selected item background |
+| `itemHeight` | `double?` | Item height |
+| `loadingIndicatorColor` | `Color?` | Loading indicator color |
+| `clearButtonColor` | `Color?` | Clear button color |
+| `dropdownIconColor` | `Color?` | Dropdown icon color |
 
 ## Advanced Search Dialog
-
-For complex search requirements, use the `AdvancedSearchDialog`:
 
 ```dart
 // Single selection
@@ -413,7 +381,6 @@ final result = await AdvancedSearchDialog.show<Product>(
     showFilters: true,
     showStats: true,
     viewMode: AdvancedSearchViewMode.grid,
-    keyboardShortcut: SingleActivator(LogicalKeyboardKey.f3),
   ),
 );
 
@@ -424,84 +391,6 @@ final results = await AdvancedSearchDialog.showMultiSelect<Product>(
   onSearch: (query, filters) async => await api.search(query),
   maxSelections: 5,
 );
-```
-
-### View Modes
-
-| Mode | Description |
-|------|-------------|
-| `list` | Traditional list view with details |
-| `grid` | Card-based grid layout |
-| `compact` | Condensed single-line items |
-
-### Configuration Options
-
-```dart
-AdvancedSearchConfig(
-  title: 'Search',                    // Dialog title
-  searchHint: 'Type to search...',    // Placeholder text
-  keyboardShortcut: SingleActivator(LogicalKeyboardKey.f3),
-  showFilters: true,                  // Show filter panel
-  showStats: true,                    // Show result statistics
-  viewMode: AdvancedSearchViewMode.list,
-  enableViewModeSwitch: true,         // Allow mode switching
-  resultsPerPage: 20,                 // Pagination size
-  enablePagination: false,            // Enable pagination
-  enableAnimations: true,             // Enable animations
-)
-```
-
-## Custom Builders
-
-### Custom Item Builder
-
-```dart
-FluentAutoSuggestBox<Product>(
-  items: products,
-  itemBuilder: (context, item) {
-    return ListTile(
-      leading: Image.network(item.value.imageUrl),
-      title: Text(item.label),
-      subtitle: Text('\$${item.value.price}'),
-      trailing: Icon(Icons.chevron_right),
-    );
-  },
-)
-```
-
-### Custom Sorter
-
-```dart
-FluentAutoSuggestBox<Product>(
-  items: products,
-  sorter: (query, items) {
-    return items.where((item) {
-      // Custom matching logic
-      return item.label.toLowerCase().contains(query.toLowerCase()) ||
-             item.value.sku.contains(query);
-    }).toSet();
-  },
-)
-```
-
-### Custom Loading Builder
-
-```dart
-FluentAutoSuggestBox<String>(
-  items: items,
-  loadingBuilder: (context) {
-    return Padding(
-      padding: EdgeInsets.all(16),
-      child: Row(
-        children: [
-          CircularProgressIndicator(),
-          SizedBox(width: 16),
-          Text('Searching...'),
-        ],
-      ),
-    );
-  },
-)
 ```
 
 ## Keyboard Navigation
@@ -535,57 +424,6 @@ FluentAutoSuggestBox<String>(
 )
 ```
 
-## Theming
-
-### Custom Theme
-
-```dart
-AdvancedSearchConfig(
-  theme: AdvancedSearchTheme(
-    primaryColor: Colors.blue,
-    backgroundColor: Colors.white,
-    cardColor: Colors.grey[50],
-    selectedItemColor: Colors.blue.withOpacity(0.1),
-    borderRadius: BorderRadius.circular(12),
-    spacing: 16.0,
-    elevation: 8.0,
-  ),
-)
-```
-
-### Custom Icons
-
-```dart
-AdvancedSearchConfig(
-  icons: AdvancedSearchIcons(
-    search: FluentIcons.search,
-    clear: FluentIcons.clear,
-    filter: FluentIcons.filter,
-    viewList: FluentIcons.view_list,
-    viewGrid: FluentIcons.grid_view_medium,
-  ),
-)
-```
-
-## Example App
-
-See the `/example` folder for a complete sample application demonstrating:
-
-- Basic autocomplete
-- Server-side search with caching
-- Form validation
-- Custom builders
-- Advanced search dialog
-- Multiple view modes
-- Keyboard shortcuts
-
-Run the example:
-
-```bash
-cd example
-flutter run
-```
-
 ## Requirements
 
 - Flutter >= 1.17.0
@@ -598,11 +436,17 @@ flutter run
 - [equatable](https://pub.dev/packages/equatable) ^2.0.5
 - [gap](https://pub.dev/packages/gap) ^3.0.1
 
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md) for version history.
+
 ## Roadmap
 
-- [x] Cubit/BLoC state management integration (similar to smart_pagination)
+- [x] Cubit/BLoC state management integration
+- [x] Theme extension support
+- [x] Material Design components support
+- [x] Smart overlay positioning
 - [ ] RTL language support improvements
-- [ ] More animation options
 - [ ] Voice search support
 - [ ] Grouped suggestions
 - [ ] Inline suggestions (ghost text)
