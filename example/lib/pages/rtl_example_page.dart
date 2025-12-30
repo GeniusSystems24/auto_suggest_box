@@ -1,5 +1,6 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:auto_suggest_box/auto_suggest_box.dart';
+import 'package:flutter/material.dart' show Theme, ThemeData, InputDecoration;
 import 'package:gap/gap.dart';
 
 class RtlExamplePage extends StatefulWidget {

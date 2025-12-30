@@ -1,5 +1,6 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:auto_suggest_box/auto_suggest_box.dart';
+import 'package:flutter/material.dart' show InputDecoration;
 import 'package:gap/gap.dart';
 
 class VoiceSearchPage extends StatefulWidget {
@@ -222,7 +223,7 @@ class _VoiceSearchPageState extends State<VoiceSearchPage> {
                                 duration: const Duration(milliseconds: 200),
                                 padding: const EdgeInsets.all(8),
                                 child: Icon(
-                                  isListening ? FluentIcons.microphone_off : FluentIcons.microphone,
+                                  isListening ? FluentIcons.microphone : FluentIcons.microphone,
                                   size: 24,
                                   color: isListening
                                       ? Colors.red

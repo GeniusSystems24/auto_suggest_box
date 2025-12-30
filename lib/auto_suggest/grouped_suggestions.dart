@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart' hide Card, ListTile, Divider, Tooltip, IconButton, Colors;
+import 'package:flutter/material.dart' hide Card, ListTile, Divider, Tooltip, IconButton, Colors, DividerThemeData;
 import 'package:fluent_ui/fluent_ui.dart';
 
 import 'auto_suggest_item.dart';

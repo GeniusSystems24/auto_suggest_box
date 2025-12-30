@@ -1,4 +1,6 @@
+import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart' show Icons;
 import 'package:speech_to_text/speech_to_text.dart';
 import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:speech_to_text/speech_recognition_error.dart';
@@ -248,6 +250,3 @@ mixin VoiceSearchMixin<T extends StatefulWidget> on State<T> {
     _voiceController.dispose();
   }
 }
-
-// Re-export for convenience
-import 'package:flutter/material.dart';

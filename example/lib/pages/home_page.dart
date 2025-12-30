@@ -167,7 +167,7 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-      content: NavigationBody(child: widget.child),
+      // content:  widget.child,
     );
   }
 
