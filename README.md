@@ -11,6 +11,10 @@ A highly customizable, performance-optimized auto-suggest/autocomplete widget fo
 - **Dual Design System** - Switch between Fluent UI and Material Design
 - **Theme Extension** - Full theming support via `FluentAutoSuggestThemeData`
 - **Smart Overlay Positioning** - Auto-shows above when space below < 300px
+- **RTL Language Support** - Full right-to-left language support (Arabic, Hebrew, etc.)
+- **Voice Search** - Speech-to-text integration for voice input
+- **Grouped Suggestions** - Organize items into collapsible groups
+- **Inline Suggestions** - Ghost text autocomplete as you type
 - **Debounced Search** - Configurable delay to reduce API calls
 - **LRU Caching** - Intelligent caching with TTL (Time To Live) expiration
 - **Keyboard Navigation** - Full support for Arrow keys, Tab, Escape, and Enter
@@ -30,7 +34,7 @@ Add this to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  auto_suggest_box: ^0.1.3
+  auto_suggest_box: ^1.8.0
 ```
 
 Then run:
@@ -100,6 +104,185 @@ FluentAutoSuggestBox<String>.form(
 )
 ```
 
+## RTL Language Support
+
+Full support for right-to-left languages like Arabic, Hebrew, and Persian.
+
+### RTL Theme
+
+```dart
+MaterialApp(
+  theme: ThemeData(
+    extensions: [
+      FluentAutoSuggestThemeData.rtl(), // Fluent UI RTL
+      // or
+      FluentAutoSuggestThemeData.materialRtl(), // Material RTL
+    ],
+  ),
+)
+```
+
+### Custom RTL Configuration
+
+```dart
+FluentAutoSuggestThemeData(
+  textDirection: TextDirection.rtl,
+  rtlMirrorIcons: true,  // Mirror icons for RTL
+  rtlMirrorLayout: true, // Mirror the entire layout
+)
+```
+
+## Voice Search
+
+Integrate speech-to-text for voice input.
+
+### Using VoiceSearchController
+
+```dart
+final voiceController = VoiceSearchController(
+  localeId: 'en_US', // or 'ar_SA' for Arabic
+  onResult: (text, isFinal) {
+    if (isFinal) {
+      textController.text = text;
+    }
+  },
+  onError: (error) {
+    print('Voice error: $error');
+  },
+);
+
+// Initialize
+await voiceController.initialize();
+
+// Start listening
+await voiceController.startListening();
+
+// Stop listening
+await voiceController.stopListening();
+```
+
+### Voice Search Button
+
+```dart
+Row(
+  children: [
+    Expanded(
+      child: FluentAutoSuggestBox<String>(
+        items: items,
+        controller: textController,
+      ),
+    ),
+    VoiceSearchButton(
+      controller: voiceController,
+      activeColor: Colors.red,
+      inactiveColor: Colors.grey,
+    ),
+  ],
+)
+```
+
+## Grouped Suggestions
+
+Organize suggestions into collapsible groups.
+
+### Creating Groups
+
+```dart
+final groups = [
+  SuggestionGroup<Product>(
+    title: 'Recent',
+    icon: FluentIcons.history,
+    items: recentProducts,
+    isExpanded: true,
+  ),
+  SuggestionGroup<Product>(
+    title: 'Popular',
+    icon: FluentIcons.favorite_star,
+    items: popularProducts,
+  ),
+  SuggestionGroup<Product>(
+    title: 'All Products',
+    icon: FluentIcons.product,
+    items: allProducts,
+    showItemCount: true,
+  ),
+];
+```
+
+### Displaying Grouped Suggestions
+
+```dart
+GroupedSuggestionsOverlay<Product>(
+  groups: groups,
+  config: GroupedSuggestionsConfig(
+    showGroupHeaders: true,
+    collapsible: true,
+    showDividers: true,
+    stickyHeaders: false,
+  ),
+  onSelected: (item) {
+    print('Selected: ${item.label}');
+  },
+)
+```
+
+### Grouping Items Automatically
+
+```dart
+// Group by first letter
+final alphabeticalGroups = groupItemsAlphabetically(items);
+
+// Group by custom key
+final categoryGroups = groupItemsBy<Product, String>(
+  items,
+  (item) => item.value.category,
+  titleBuilder: (category) => category.toUpperCase(),
+  iconBuilder: (category) => categoryIcons[category],
+);
+```
+
+## Inline Suggestions (Ghost Text)
+
+Show autocomplete suggestions as ghost text while typing.
+
+### Using InlineSuggestionTextField
+
+```dart
+InlineSuggestionTextField<Product>(
+  items: products,
+  config: InlineSuggestionConfig(
+    ghostTextColor: Colors.grey,
+    acceptOnTab: true,           // Tab to accept full suggestion
+    partialAcceptOnArrowRight: true, // Right arrow to accept one word
+  ),
+  onSuggestionAccepted: (item) {
+    print('Accepted: ${item.label}');
+  },
+)
+```
+
+### Using InlineSuggestionController
+
+```dart
+final suggestionController = InlineSuggestionController(
+  acceptKey: LogicalKeyboardKey.tab,
+  partialAcceptKey: LogicalKeyboardKey.arrowRight,
+  caseSensitive: false,
+);
+
+// Update as user types
+suggestionController.updateText(textController.text);
+
+// Set suggestion from best match
+suggestionController.setSuggestion(bestMatch.label);
+
+// Accept full suggestion
+final newText = suggestionController.acceptFull();
+
+// Accept one word
+final partialText = suggestionController.acceptWord();
+```
+
 ## Theme Extension
 
 Use `FluentAutoSuggestThemeData` to customize the appearance globally:
@@ -122,21 +305,29 @@ MaterialApp(
 MaterialApp(
   theme: ThemeData(
     extensions: [
-      FluentAutoSuggestThemeData(
-        designSystem: AutoSuggestDesignSystem.material,
-        textFieldDecoration: InputDecoration(
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
-          filled: true,
-          contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        ),
-        overlayBorderRadius: 8.0,
-        overlayElevation: 8.0,
-      ),
+      FluentAutoSuggestThemeData.material(isDark: false),
     ],
   ),
 )
+```
+
+### Preset Themes
+
+```dart
+// Light theme (Fluent)
+FluentAutoSuggestThemeData.light()
+
+// Dark theme (Fluent)
+FluentAutoSuggestThemeData.dark()
+
+// Material Design theme
+FluentAutoSuggestThemeData.material(isDark: false)
+
+// RTL Fluent theme
+FluentAutoSuggestThemeData.rtl(isDark: false)
+
+// RTL Material theme
+FluentAutoSuggestThemeData.materialRtl(isDark: false)
 ```
 
 ### Custom Theme
@@ -168,6 +359,11 @@ FluentAutoSuggestThemeData(
   itemSelectedTextStyle: TextStyle(...),
   itemHeight: 48.0,
 
+  // RTL support
+  textDirection: TextDirection.rtl,
+  rtlMirrorIcons: true,
+  rtlMirrorLayout: true,
+
   // Loading state
   loadingIndicatorColor: Colors.blue,
   loadingTextStyle: TextStyle(...),
@@ -182,19 +378,6 @@ FluentAutoSuggestThemeData(
   clearButtonColor: Colors.grey[500],
   dropdownIconColor: Colors.grey[600],
 )
-```
-
-### Preset Themes
-
-```dart
-// Light theme (Fluent)
-FluentAutoSuggestThemeData.light()
-
-// Dark theme (Fluent)
-FluentAutoSuggestThemeData.dark()
-
-// Material Design theme
-FluentAutoSuggestThemeData.material(isDark: false)
 ```
 
 ## Smart Overlay Positioning
@@ -294,24 +477,6 @@ FluentAutoSuggestBox<Product>.cubit(
 )
 ```
 
-### State Properties
-
-```dart
-final state = cubit.state;
-
-state.items           // List of items
-state.selectedItem    // Currently selected item
-state.text            // Current text in input
-state.isLoading       // Loading state
-state.error           // Error object (if any)
-state.hasError        // Has error
-state.hasSelection    // Has selected item
-state.isEmpty         // Items list is empty
-state.itemCount       // Number of items
-state.isEnabled       // Is widget enabled
-state.isReadOnly      // Is widget read-only
-```
-
 ## API Reference
 
 ### FluentAutoSuggestBox
@@ -354,6 +519,9 @@ FluentAutoSuggestBoxItem<T>({
 | Property | Type | Description |
 |----------|------|-------------|
 | `designSystem` | `AutoSuggestDesignSystem` | fluent or material |
+| `textDirection` | `TextDirection?` | ltr or rtl |
+| `rtlMirrorIcons` | `bool` | Mirror icons in RTL mode |
+| `rtlMirrorLayout` | `bool` | Mirror layout in RTL mode |
 | `textFieldDecoration` | `InputDecoration?` | Text field decoration |
 | `textFieldStyle` | `TextStyle?` | Text style for input |
 | `overlayBackgroundColor` | `Color?` | Overlay background color |
@@ -365,34 +533,6 @@ FluentAutoSuggestBoxItem<T>({
 | `clearButtonColor` | `Color?` | Clear button color |
 | `dropdownIconColor` | `Color?` | Dropdown icon color |
 
-## Advanced Search Dialog
-
-```dart
-// Single selection
-final result = await AdvancedSearchDialog.show<Product>(
-  context: context,
-  items: products,
-  onSearch: (query, filters) async {
-    return await api.search(query, filters: filters);
-  },
-  config: AdvancedSearchConfig(
-    title: 'Find Product',
-    searchHint: 'Search by name or SKU...',
-    showFilters: true,
-    showStats: true,
-    viewMode: AdvancedSearchViewMode.grid,
-  ),
-);
-
-// Multi-selection
-final results = await AdvancedSearchDialog.showMultiSelect<Product>(
-  context: context,
-  items: products,
-  onSearch: (query, filters) async => await api.search(query),
-  maxSelections: 5,
-);
-```
-
 ## Keyboard Navigation
 
 | Key | Action |
@@ -400,9 +540,10 @@ final results = await AdvancedSearchDialog.showMultiSelect<Product>(
 | `Arrow Down` | Select next item |
 | `Arrow Up` | Select previous item |
 | `Enter` | Confirm selection |
-| `Tab` | Move to next field |
+| `Tab` | Accept inline suggestion / Move to next field |
 | `Shift+Tab` | Move to previous field |
-| `Escape` | Close suggestions |
+| `Escape` | Close suggestions / Dismiss inline suggestion |
+| `Right Arrow` | Accept one word of inline suggestion |
 | `F3` | Open advanced search (if enabled) |
 
 ## Performance Tips
@@ -435,6 +576,7 @@ FluentAutoSuggestBox<String>(
 - [flutter_bloc](https://pub.dev/packages/flutter_bloc) ^8.1.6
 - [equatable](https://pub.dev/packages/equatable) ^2.0.5
 - [gap](https://pub.dev/packages/gap) ^3.0.1
+- [speech_to_text](https://pub.dev/packages/speech_to_text) ^7.0.0
 
 ## Changelog
 
@@ -446,10 +588,10 @@ See [CHANGELOG.md](CHANGELOG.md) for version history.
 - [x] Theme extension support
 - [x] Material Design components support
 - [x] Smart overlay positioning
-- [ ] RTL language support improvements
-- [ ] Voice search support
-- [ ] Grouped suggestions
-- [ ] Inline suggestions (ghost text)
+- [x] RTL language support
+- [x] Voice search support
+- [x] Grouped suggestions
+- [x] Inline suggestions (ghost text)
 - [ ] Pagination support for large datasets
 
 ## Contributing

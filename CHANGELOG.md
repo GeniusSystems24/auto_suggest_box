@@ -5,6 +5,48 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.8.0] - 2024-12-30
+
+### Added
+
+#### RTL Language Support
+- Full RTL (Right-to-Left) language support for Arabic, Hebrew, Persian, and other RTL languages
+- New theme properties: `textDirection`, `rtlMirrorIcons`, `rtlMirrorLayout`
+- RTL preset themes: `FluentAutoSuggestThemeData.rtl()` and `FluentAutoSuggestThemeData.materialRtl()`
+- Automatic text direction detection based on locale
+- Proper icon mirroring in RTL mode
+
+#### Voice Search Support
+- New `VoiceSearchController` for speech-to-text integration
+- `VoiceSearchButton` widget for easy voice search UI
+- `VoiceSearchMixin` for adding voice search to custom widgets
+- Support for multiple locales with automatic locale detection
+- Real-time speech recognition with partial results
+- Configurable listen duration and pause detection
+
+#### Grouped Suggestions
+- New `SuggestionGroup<T>` class for organizing items into groups
+- `GroupedSuggestionsOverlay<T>` widget for displaying grouped items
+- `GroupedSuggestionsConfig` for customizing group display
+- Collapsible groups with animation
+- Custom header and divider builders
+- Helper functions: `groupItemsBy()` and `groupItemsAlphabetically()`
+- Sticky headers option for long lists
+
+#### Inline Suggestions (Ghost Text)
+- New `InlineSuggestionController` for managing ghost text
+- `InlineSuggestionTextField<T>` widget with ghost text support
+- `InlineSuggestionConfig` for customizing appearance
+- Tab key to accept full suggestion
+- Right Arrow key to accept one word
+- Escape key to dismiss suggestion
+- `InlineSuggestionMixin` for adding to custom widgets
+
+### Changed
+- Updated dependencies: Added `speech_to_text: ^7.0.0`
+
+---
+
 ## [0.1.3] - 2024-12-24
 
 ### Changed

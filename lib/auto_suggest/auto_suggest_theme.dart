@@ -71,6 +71,10 @@ class FluentAutoSuggestThemeData extends ThemeExtension<FluentAutoSuggestThemeDa
     this.iconColor,
     this.clearButtonColor,
     this.dropdownIconColor,
+    // RTL support
+    this.textDirection,
+    this.rtlMirrorIcons = true,
+    this.rtlMirrorLayout = true,
   });
 
   /// The design system to use for input components
@@ -172,6 +176,16 @@ class FluentAutoSuggestThemeData extends ThemeExtension<FluentAutoSuggestThemeDa
   /// Dropdown icon color
   final Color? dropdownIconColor;
 
+  // RTL support
+  /// Text direction for the widget (ltr or rtl)
+  final TextDirection? textDirection;
+
+  /// Whether to mirror icons in RTL mode
+  final bool rtlMirrorIcons;
+
+  /// Whether to mirror the layout in RTL mode
+  final bool rtlMirrorLayout;
+
   @override
   FluentAutoSuggestThemeData copyWith({
     AutoSuggestDesignSystem? designSystem,
@@ -205,6 +219,9 @@ class FluentAutoSuggestThemeData extends ThemeExtension<FluentAutoSuggestThemeDa
     Color? iconColor,
     Color? clearButtonColor,
     Color? dropdownIconColor,
+    TextDirection? textDirection,
+    bool? rtlMirrorIcons,
+    bool? rtlMirrorLayout,
   }) {
     return FluentAutoSuggestThemeData(
       designSystem: designSystem ?? this.designSystem,
@@ -238,6 +255,9 @@ class FluentAutoSuggestThemeData extends ThemeExtension<FluentAutoSuggestThemeDa
       iconColor: iconColor ?? this.iconColor,
       clearButtonColor: clearButtonColor ?? this.clearButtonColor,
       dropdownIconColor: dropdownIconColor ?? this.dropdownIconColor,
+      textDirection: textDirection ?? this.textDirection,
+      rtlMirrorIcons: rtlMirrorIcons ?? this.rtlMirrorIcons,
+      rtlMirrorLayout: rtlMirrorLayout ?? this.rtlMirrorLayout,
     );
   }
 
@@ -279,6 +299,9 @@ class FluentAutoSuggestThemeData extends ThemeExtension<FluentAutoSuggestThemeDa
       iconColor: Color.lerp(iconColor, other.iconColor, t),
       clearButtonColor: Color.lerp(clearButtonColor, other.clearButtonColor, t),
       dropdownIconColor: Color.lerp(dropdownIconColor, other.dropdownIconColor, t),
+      textDirection: t < 0.5 ? textDirection : other.textDirection,
+      rtlMirrorIcons: t < 0.5 ? rtlMirrorIcons : other.rtlMirrorIcons,
+      rtlMirrorLayout: t < 0.5 ? rtlMirrorLayout : other.rtlMirrorLayout,
     );
   }
 
@@ -342,6 +365,25 @@ class FluentAutoSuggestThemeData extends ThemeExtension<FluentAutoSuggestThemeDa
       itemSelectedBackgroundColor: isDark
           ? Colors.blue.withOpacity(0.3)
           : Colors.blue.withOpacity(0.1),
+    );
+  }
+
+  /// RTL theme preset for right-to-left languages (Arabic, Hebrew, etc.)
+  static FluentAutoSuggestThemeData rtl({bool isDark = false}) {
+    final base = isDark ? dark() : light();
+    return base.copyWith(
+      textDirection: TextDirection.rtl,
+      rtlMirrorIcons: true,
+      rtlMirrorLayout: true,
+    );
+  }
+
+  /// RTL Material theme preset
+  static FluentAutoSuggestThemeData materialRtl({bool isDark = false}) {
+    return material(isDark: isDark).copyWith(
+      textDirection: TextDirection.rtl,
+      rtlMirrorIcons: true,
+      rtlMirrorLayout: true,
     );
   }
 }
