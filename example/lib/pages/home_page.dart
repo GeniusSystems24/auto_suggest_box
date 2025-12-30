@@ -13,89 +13,72 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  int _selectedIndex = 0;
-
-  final List<_NavigationItem> _navigationItems = [
-    _NavigationItem(
-      icon: FluentIcons.home,
-      title: 'Basic Example',
-      route: AppRoutes.basic,
-    ),
-    _NavigationItem(
-      icon: FluentIcons.cloud,
-      title: 'Server Search',
-      route: AppRoutes.serverSearch,
-    ),
-    _NavigationItem(
-      icon: FluentIcons.checkbox_composite,
-      title: 'Form Validation',
-      route: AppRoutes.formValidation,
-    ),
-    _NavigationItem(
-      icon: FluentIcons.design,
-      title: 'Custom Builders',
-      route: AppRoutes.customBuilders,
-    ),
-    _NavigationItem(
-      icon: FluentIcons.search,
-      title: 'Advanced Search',
-      route: AppRoutes.advancedSearch,
-    ),
-    _NavigationItem(
-      icon: FluentIcons.database,
-      title: 'Caching Demo',
-      route: AppRoutes.cachingDemo,
-    ),
-    _NavigationItem(
-      icon: FluentIcons.code,
-      title: 'Cubit/BLoC',
-      route: AppRoutes.cubitExample,
-    ),
-    // New v1.8.0 features
-    _NavigationItem(
-      icon: FluentIcons.locale_language,
-      title: 'RTL Support',
-      route: AppRoutes.rtlExample,
-      isNew: true,
-    ),
-    _NavigationItem(
-      icon: FluentIcons.microphone,
-      title: 'Voice Search',
-      route: AppRoutes.voiceSearch,
-      isNew: true,
-    ),
-    _NavigationItem(
-      icon: FluentIcons.group_list,
-      title: 'Grouped Suggestions',
-      route: AppRoutes.groupedSuggestions,
-      isNew: true,
-    ),
-    _NavigationItem(
-      icon: FluentIcons.text_field,
-      title: 'Inline Suggestions',
-      route: AppRoutes.inlineSuggestions,
-      isNew: true,
-    ),
-  ];
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    _updateSelectedIndex();
+  // Calculate selected index based on current route
+  int _getSelectedIndex(String location) {
+    switch (location) {
+      case '/':
+      case '/basic':
+        return 0;
+      case '/server-search':
+        return 1;
+      case '/form-validation':
+        return 2;
+      case '/custom-builders':
+        return 3;
+      case '/advanced-search':
+        return 4;
+      case '/caching-demo':
+        return 5;
+      case '/cubit-example':
+        return 6;
+      case '/rtl-example':
+        return 7;
+      case '/voice-search':
+        return 8;
+      case '/grouped-suggestions':
+        return 9;
+      case '/inline-suggestions':
+        return 10;
+      default:
+        return 0;
+    }
   }
 
-  void _updateSelectedIndex() {
-    final location = GoRouterState.of(context).uri.path;
-    final index = _navigationItems.indexWhere((item) => item.route == location);
-    if (index != -1 && index != _selectedIndex) {
-      setState(() => _selectedIndex = index);
-    } else if (location == '/' && _selectedIndex != 0) {
-      setState(() => _selectedIndex = 0);
+  // Get route from selected index
+  String _getRouteFromIndex(int index) {
+    switch (index) {
+      case 0:
+        return AppRoutes.basic;
+      case 1:
+        return AppRoutes.serverSearch;
+      case 2:
+        return AppRoutes.formValidation;
+      case 3:
+        return AppRoutes.customBuilders;
+      case 4:
+        return AppRoutes.advancedSearch;
+      case 5:
+        return AppRoutes.cachingDemo;
+      case 6:
+        return AppRoutes.cubitExample;
+      case 7:
+        return AppRoutes.rtlExample;
+      case 8:
+        return AppRoutes.voiceSearch;
+      case 9:
+        return AppRoutes.groupedSuggestions;
+      case 10:
+        return AppRoutes.inlineSuggestions;
+      default:
+        return AppRoutes.basic;
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final location = GoRouterState.of(context).uri.path;
+    final selectedIndex = _getSelectedIndex(location);
+
     return NavigationView(
       appBar: NavigationAppBar(
         automaticallyImplyLeading: false,
@@ -122,82 +105,86 @@ class _HomePageState extends State<HomePage> {
             ),
           ],
         ),
-        actions: Padding(
-          padding: const EdgeInsets.only(right: 16),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Tooltip(
-                message: 'Toggle Theme',
-                child: IconButton(
-                  icon: Icon(
-                    FluentTheme.of(context).brightness == Brightness.dark
-                        ? FluentIcons.sunny
-                        : FluentIcons.clear_night,
-                  ),
-                  onPressed: () {
-                    // Theme toggle would be handled by parent
-                  },
-                ),
-              ),
-            ],
-          ),
-        ),
       ),
       pane: NavigationPane(
-        selected: _selectedIndex,
+        selected: selectedIndex,
         onChanged: (index) {
-          setState(() => _selectedIndex = index);
-          context.go(_navigationItems[index].route);
+          final route = _getRouteFromIndex(index);
+          context.go(route);
         },
         displayMode: PaneDisplayMode.auto,
         items: [
-          PaneItemHeader(header: const Text('Examples')),
-          ..._navigationItems.take(7).map((item) => _buildPaneItem(item)),
-          PaneItemSeparator(),
-          PaneItemHeader(header: const Text('v1.8.0 Features')),
-          ..._navigationItems.skip(7).map((item) => _buildPaneItem(item)),
+          // Basic Examples
+          PaneItem(
+            icon: const Icon(FluentIcons.home),
+            title: const Text('Basic Example'),
+            body: widget.child,
+          ),
+          PaneItem(
+            icon: const Icon(FluentIcons.cloud),
+            title: const Text('Server Search'),
+            body: widget.child,
+          ),
+          PaneItem(
+            icon: const Icon(FluentIcons.checkbox_composite),
+            title: const Text('Form Validation'),
+            body: widget.child,
+          ),
+          PaneItem(
+            icon: const Icon(FluentIcons.design),
+            title: const Text('Custom Builders'),
+            body: widget.child,
+          ),
+          PaneItem(
+            icon: const Icon(FluentIcons.search),
+            title: const Text('Advanced Search'),
+            body: widget.child,
+          ),
+          PaneItem(
+            icon: const Icon(FluentIcons.database),
+            title: const Text('Caching Demo'),
+            body: widget.child,
+          ),
+          PaneItem(
+            icon: const Icon(FluentIcons.code),
+            title: const Text('Cubit/BLoC'),
+            body: widget.child,
+          ),
+          // v1.8.0 Features
+          PaneItem(
+            icon: const Icon(FluentIcons.locale_language),
+            title: const Text('RTL Support'),
+            body: widget.child,
+            infoBadge: const InfoBadge(source: Text('NEW')),
+          ),
+          PaneItem(
+            icon: const Icon(FluentIcons.microphone),
+            title: const Text('Voice Search'),
+            body: widget.child,
+            infoBadge: const InfoBadge(source: Text('NEW')),
+          ),
+          PaneItem(
+            icon: const Icon(FluentIcons.group_list),
+            title: const Text('Grouped Suggestions'),
+            body: widget.child,
+            infoBadge: const InfoBadge(source: Text('NEW')),
+          ),
+          PaneItem(
+            icon: const Icon(FluentIcons.text_field),
+            title: const Text('Inline Suggestions'),
+            body: widget.child,
+            infoBadge: const InfoBadge(source: Text('NEW')),
+          ),
         ],
         footerItems: [
           PaneItem(
             icon: const Icon(FluentIcons.info),
             title: const Text('About'),
-            body: const SizedBox.shrink(),
+            body: widget.child,
             onTap: () => _showAboutDialog(context),
           ),
         ],
       ),
-      // content:  widget.child,
-    );
-  }
-
-  PaneItem _buildPaneItem(_NavigationItem item) {
-    return PaneItem(
-      icon: Icon(item.icon),
-      title: Row(
-        children: [
-          Text(item.title),
-          if (item.isNew) ...[
-            const SizedBox(width: 8),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-              decoration: BoxDecoration(
-                color: Colors.green,
-                borderRadius: BorderRadius.circular(4),
-              ),
-              child: const Text(
-                'NEW',
-                style: TextStyle(
-                  fontSize: 10,
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ],
-        ],
-      ),
-      body: const SizedBox.shrink(),
     );
   }
 
@@ -237,18 +224,4 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
-}
-
-class _NavigationItem {
-  const _NavigationItem({
-    required this.icon,
-    required this.title,
-    required this.route,
-    this.isNew = false,
-  });
-
-  final IconData icon;
-  final String title;
-  final String route;
-  final bool isNew;
 }
