@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart' hide Card, ListTile, Divider, Tooltip, IconButton, Colors;
+import 'package:flutter/widgets.dart';
 import 'package:flutter/services.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 
@@ -416,16 +416,20 @@ class _InlineSuggestionTextFieldState<T> extends State<InlineSuggestionTextField
               );
             },
           ),
-          // Actual text field
-          TextField(
+          // Actual text field - using Fluent UI TextBox
+          TextBox(
             controller: _controller,
             focusNode: _focusNode,
-            decoration: widget.decoration,
+            placeholder: widget.decoration?.hintText,
+            prefix: widget.decoration?.prefixText != null
+                ? Padding(
+                    padding: const EdgeInsets.only(left: 8),
+                    child: Text(widget.decoration!.prefixText!),
+                  )
+                : null,
             style: widget.style,
             enabled: widget.enabled,
             autofocus: widget.autofocus,
-            textInputAction: widget.textInputAction,
-            keyboardType: widget.keyboardType,
             onSubmitted: widget.onSubmitted,
           ),
         ],

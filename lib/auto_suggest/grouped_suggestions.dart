@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart' hide Card, ListTile, Divider, Tooltip, IconButton, Colors, DividerThemeData;
+import 'package:flutter/widgets.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 
 import 'auto_suggest_item.dart';
@@ -264,11 +264,11 @@ class _GroupedSuggestionsOverlayState<T> extends State<GroupedSuggestionsOverlay
     final theme = FluentTheme.of(context);
     final config = widget.config;
 
-    return Container(
-      padding: config.headerPadding,
-      color: config.headerBackgroundColor ?? theme.scaffoldBackgroundColor.withOpacity(0.9),
-      child: InkWell(
-        onTap: config.collapsible ? () => _toggleGroup(group.title) : null,
+    return GestureDetector(
+      onTap: config.collapsible ? () => _toggleGroup(group.title) : null,
+      child: Container(
+        padding: config.headerPadding,
+        color: config.headerBackgroundColor ?? theme.scaffoldBackgroundColor.withOpacity(0.9),
         child: Row(
           children: [
             if (group.icon != null) ...[
