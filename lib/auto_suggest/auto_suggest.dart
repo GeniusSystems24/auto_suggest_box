@@ -19,6 +19,9 @@ export 'auto_suggest_cache.dart';
 export 'auto_suggest_controller.dart';
 export 'auto_suggest_overlay.dart';
 export 'auto_suggest_theme.dart';
+export 'voice_search_controller.dart';
+export 'grouped_suggestions.dart';
+export 'inline_suggestion.dart';
 
 // Import for internal use
 import 'auto_suggest_item.dart';
