@@ -2,6 +2,7 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:auto_suggest_box/auto_suggest_box.dart';
 import 'package:flutter/material.dart' show InputDecoration;
 import 'package:gap/gap.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class VoiceSearchPage extends StatefulWidget {
   const VoiceSearchPage({super.key});
@@ -16,6 +17,8 @@ class _VoiceSearchPageState extends State<VoiceSearchPage> {
   String _status = 'Not initialized';
   String _lastRecognizedWords = '';
   bool _isInitialized = false;
+  PermissionStatus _permissionStatus = PermissionStatus.denied;
+  bool _isCheckingPermission = false;
 
   final List<FluentAutoSuggestBoxItem<String>> _items = [
     FluentAutoSuggestBoxItem(value: '1', label: 'Apple iPhone 15 Pro'),
@@ -34,6 +37,7 @@ class _VoiceSearchPageState extends State<VoiceSearchPage> {
   void initState() {
     super.initState();
     _initVoiceController();
+    _checkPermission();
   }
 
   void _initVoiceController() {
@@ -56,6 +60,26 @@ class _VoiceSearchPageState extends State<VoiceSearchPage> {
     );
 
     _voiceController.addListener(_onVoiceStateChanged);
+  }
+
+  Future<void> _checkPermission() async {
+    setState(() => _isCheckingPermission = true);
+    _permissionStatus = await _voiceController.checkPermission();
+    setState(() => _isCheckingPermission = false);
+  }
+
+  Future<void> _requestPermission() async {
+    setState(() => _isCheckingPermission = true);
+    _permissionStatus = await _voiceController.requestPermission();
+    setState(() => _isCheckingPermission = false);
+
+    if (_permissionStatus.isGranted) {
+      _initialize();
+    }
+  }
+
+  Future<void> _openSettings() async {
+    await _voiceController.openSettings();
   }
 
   void _onVoiceStateChanged() {
@@ -86,6 +110,39 @@ class _VoiceSearchPageState extends State<VoiceSearchPage> {
     _voiceController.dispose();
     _textController.dispose();
     super.dispose();
+  }
+
+  Color _getPermissionColor() {
+    switch (_permissionStatus) {
+      case PermissionStatus.granted:
+      case PermissionStatus.limited:
+        return Colors.green;
+      case PermissionStatus.denied:
+        return Colors.orange;
+      case PermissionStatus.permanentlyDenied:
+        return Colors.red;
+      case PermissionStatus.restricted:
+        return Colors.grey;
+      case PermissionStatus.provisional:
+        return Colors.blue;
+    }
+  }
+
+  String _getPermissionStatusText() {
+    switch (_permissionStatus) {
+      case PermissionStatus.granted:
+        return 'Granted';
+      case PermissionStatus.limited:
+        return 'Limited';
+      case PermissionStatus.denied:
+        return 'Denied';
+      case PermissionStatus.permanentlyDenied:
+        return 'Permanently Denied';
+      case PermissionStatus.restricted:
+        return 'Restricted';
+      case PermissionStatus.provisional:
+        return 'Provisional';
+    }
   }
 
   @override
@@ -123,6 +180,106 @@ class _VoiceSearchPageState extends State<VoiceSearchPage> {
                 ),
                 severity: InfoBarSeverity.warning,
               ),
+            ],
+          ),
+        ),
+        const Gap(24),
+
+        // Permission Status Card
+        Card(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Icon(FluentIcons.permissions, size: 20),
+                  const Gap(8),
+                  Text(
+                    'Microphone Permission',
+                    style: FluentTheme.of(context).typography.subtitle,
+                  ),
+                ],
+              ),
+              const Gap(16),
+
+              // Permission status indicator
+              Row(
+                children: [
+                  Container(
+                    width: 12,
+                    height: 12,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: _getPermissionColor(),
+                    ),
+                  ),
+                  const Gap(8),
+                  Text('Status: ${_getPermissionStatusText()}'),
+                  if (_isCheckingPermission) ...[
+                    const Gap(8),
+                    const SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: ProgressRing(strokeWidth: 2),
+                    ),
+                  ],
+                ],
+              ),
+              const Gap(16),
+
+              // Permission action buttons
+              Wrap(
+                spacing: 12,
+                runSpacing: 8,
+                children: [
+                  if (!_permissionStatus.isGranted && !_permissionStatus.isPermanentlyDenied)
+                    FilledButton(
+                      onPressed: _isCheckingPermission ? null : _requestPermission,
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(FluentIcons.microphone, size: 16),
+                          const Gap(8),
+                          const Text('Request Permission'),
+                        ],
+                      ),
+                    ),
+                  if (_permissionStatus.isPermanentlyDenied)
+                    FilledButton(
+                      onPressed: _openSettings,
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(FluentIcons.settings, size: 16),
+                          const Gap(8),
+                          const Text('Open Settings'),
+                        ],
+                      ),
+                    ),
+                  Button(
+                    onPressed: _isCheckingPermission ? null : _checkPermission,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(FluentIcons.refresh, size: 16),
+                        const Gap(8),
+                        const Text('Refresh Status'),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+
+              if (_permissionStatus.isPermanentlyDenied) ...[
+                const Gap(12),
+                InfoBar(
+                  title: const Text('Permission Denied'),
+                  content: const Text(
+                    'Microphone permission was permanently denied. Please enable it from app settings.',
+                  ),
+                  severity: InfoBarSeverity.error,
+                ),
+              ],
             ],
           ),
         ),
@@ -353,7 +510,22 @@ final voiceController = VoiceSearchController(
   onError: (error) => print('Error: \$error'),
 );
 
-// Initialize
+// Check permission status
+final status = await voiceController.checkPermission();
+print('Permission status: \$status');
+
+// Request permission
+final newStatus = await voiceController.requestPermission();
+if (newStatus.isGranted) {
+  // Permission granted, proceed with initialization
+}
+
+// Open app settings (if permanently denied)
+if (newStatus.isPermanentlyDenied) {
+  await voiceController.openSettings();
+}
+
+// Initialize (auto-requests permission if needed)
 await voiceController.initialize();
 
 // Start/Stop listening

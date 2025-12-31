@@ -79,3 +79,6 @@ export 'advanced_auto_suggest/auto_suggest_advanced.dart';
 export 'common/text.dart';
 export 'common/text_form.dart';
 export 'common/validator_form_field.dart';
+
+// Re-export permission handler for voice search
+export 'package:permission_handler/permission_handler.dart' show PermissionStatus;

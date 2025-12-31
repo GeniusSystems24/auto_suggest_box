@@ -1,6 +1,7 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' show Icons;
+import 'package:permission_handler/permission_handler.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:speech_to_text/speech_recognition_error.dart';
@@ -38,9 +39,19 @@ class VoiceSearchController extends ChangeNotifier {
   String _lastWords = '';
   String _currentLocale = '';
   List<LocaleName> _availableLocales = [];
+  PermissionStatus _permissionStatus = PermissionStatus.denied;
 
   /// Whether the speech recognition is initialized
   bool get isInitialized => _isInitialized;
+
+  /// The current microphone permission status
+  PermissionStatus get permissionStatus => _permissionStatus;
+
+  /// Whether microphone permission is granted
+  bool get hasPermission => _permissionStatus.isGranted;
+
+  /// Whether microphone permission is permanently denied
+  bool get isPermanentlyDenied => _permissionStatus.isPermanentlyDenied;
 
   /// Whether speech recognition is currently listening
   bool get isListening => _isListening;
@@ -57,11 +68,53 @@ class VoiceSearchController extends ChangeNotifier {
   /// Available locales for speech recognition
   List<LocaleName> get availableLocales => _availableLocales;
 
+  /// Check current microphone permission status
+  Future<PermissionStatus> checkPermission() async {
+    _permissionStatus = await Permission.microphone.status;
+    notifyListeners();
+    return _permissionStatus;
+  }
+
+  /// Request microphone permission
+  Future<PermissionStatus> requestPermission() async {
+    _permissionStatus = await Permission.microphone.request();
+    notifyListeners();
+    return _permissionStatus;
+  }
+
+  /// Open app settings (useful when permission is permanently denied)
+  Future<bool> openSettings() async {
+    return await openAppSettings();
+  }
+
   /// Initialize speech recognition
+  /// This will automatically request microphone permission if not granted
   Future<bool> initialize() async {
     if (_isInitialized) return _isAvailable;
 
     try {
+      // Check and request microphone permission
+      _permissionStatus = await Permission.microphone.status;
+
+      if (!_permissionStatus.isGranted) {
+        _permissionStatus = await Permission.microphone.request();
+        notifyListeners();
+
+        if (!_permissionStatus.isGranted) {
+          _isInitialized = true;
+          _isAvailable = false;
+
+          if (_permissionStatus.isPermanentlyDenied) {
+            onError?.call('Microphone permission permanently denied. Please enable it in settings.');
+          } else {
+            onError?.call('Microphone permission denied.');
+          }
+
+          notifyListeners();
+          return false;
+        }
+      }
+
       _isAvailable = await _speech.initialize(
         onError: _handleError,
         onStatus: _handleStatus,
@@ -244,6 +297,21 @@ mixin VoiceSearchMixin<T extends StatefulWidget> on State<T> {
       onError: onError,
     );
     _voiceController.initialize();
+  }
+
+  /// Check microphone permission status
+  Future<PermissionStatus> checkVoicePermission() {
+    return _voiceController.checkPermission();
+  }
+
+  /// Request microphone permission
+  Future<PermissionStatus> requestVoicePermission() {
+    return _voiceController.requestPermission();
+  }
+
+  /// Open app settings for permission management
+  Future<bool> openVoiceSettings() {
+    return _voiceController.openSettings();
   }
 
   void disposeVoiceSearch() {
