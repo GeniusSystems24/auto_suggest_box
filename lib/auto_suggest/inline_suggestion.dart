@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart' hide Colors;
 import 'package:flutter/widgets.dart';
 import 'package:flutter/services.dart';
 import 'package:fluent_ui/fluent_ui.dart';
