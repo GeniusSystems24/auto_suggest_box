@@ -1,4 +1,4 @@
-/// Sample data models and mock data for the example app
+// Sample data models and mock data for the example app
 
 class Country {
   final String code;
